@@ -1,6 +1,23 @@
 /* importar los recursos de tailwind */
 
-@import "tailwindcss"; 
+@import "tailwindcss";
+
+@keyframes slide-in-out {
+  0% {
+    transform: translateX(-100%);
+  }
+  10%,
+  90% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-slide-in-out {
+  animation: slide-in-out 5s ease-in-out;
+}
 
 /* estilos para hacer el fondo oscuro */
 :root {

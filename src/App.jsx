@@ -7,6 +7,7 @@ import About from './components/About/About';
 import Contacto from './components/Contacto/Contacto';
 import NotFound from './components/NotFound/NotFound';
 import Login from './components/Login/Login';
+import ListaActividades from './components/ListaActividades/ListaActividades';
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -32,6 +33,7 @@ const App = () => {
       <Route path="/" element={user ? <Reloj /> : <Login onLogin={handleLogin} />} />
       <Route path="/about" element={user ? <About /> : <Login onLogin={handleLogin} />} />
       <Route path="/contacto" element={user ? <Contacto /> : <Login onLogin={handleLogin} />} />
+      <Route path="/listaactividades" element={user ? <ListaActividades /> : <Login onLogin={handleLogin} />} />
       <Route path="/login" element={<Login onLogin={handleLogin} />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

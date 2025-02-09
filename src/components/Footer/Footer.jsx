@@ -19,9 +19,9 @@ const Footer = () => {
             <div className="flex flex-col items-center justify-center text-white">
                 <p className="font-semibold text-xl">Redes Sociales</p>
                 <div className="flex gap-4 mt-2">
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><FacebookIcon/></a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><XIcon/></a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><InstagramIcon/></a>
+                    <a href="https://www.facebook.com/adrian.paulo.56614/?locale=es_LA" target="_blank" rel="noopener noreferrer"><FacebookIcon/></a>
+                    <a href="https://x.com/AdrianPauloV" target="_blank" rel="noopener noreferrer"><XIcon/></a>
+                    <a href="https://www.instagram.com/slimy_h._arbogast/" target="_blank" rel="noopener noreferrer"><InstagramIcon/></a>
                     <a href="https://github.com/HectorPaulo" target="_blank" rel="noopener noreferrer"><GitHubIcon/></a>
                 </div>
             </div>

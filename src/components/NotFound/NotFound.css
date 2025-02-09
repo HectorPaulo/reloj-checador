@@ -1,84 +1,40 @@
 .main_wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30em;
-    height: 30em;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.antenna {
+  /* Estilos para la antena */
+}
+
+.antenna_shadow {
+  /* Estilos para la sombra de la antena */
+}
+
+.antenna::after {
+  /* Estilos para el pseudo-elemento after de la antena */
+}
+
+.antenna::before {
+  /* Estilos para el pseudo-elemento before de la antena */
+}
+
+.a1 {
+  /* Estilos para el elemento a1 */
+}
+
+/* Agrega aquí los estilos adicionales necesarios para los otros elementos */
   
-  .main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 5em;
-  }
-  
-  .antenna {
-    width: 5em;
-    height: 5em;
-    border-radius: 50%;
-    border: 2px solid black;
-    background-color: #f27405;
-    margin-bottom: -6em;
-    margin-left: 0em;
-    z-index: -1;
-  }
-  .antenna_shadow {
-    position: absolute;
-    background-color: transparent;
-    width: 50px;
-    height: 56px;
-    margin-left: 1.68em;
-    border-radius: 45%;
-    transform: rotate(140deg);
-    border: 4px solid transparent;
-    box-shadow:
-      inset 0px 16px #a85103,
-      inset 0px 16px 1px 1px #a85103;
-    -moz-box-shadow:
-      inset 0px 16px #a85103,
-      inset 0px 16px 1px 1px #a85103;
-  }
-  .antenna::after {
-    content: "";
-    position: absolute;
-    margin-top: -9.4em;
-    margin-left: 0.4em;
-    transform: rotate(-25deg);
-    width: 1em;
-    height: 0.5em;
-    border-radius: 50%;
-    background-color: #f69e50;
-  }
-  .antenna::before {
-    content: "";
-    position: absolute;
-    margin-top: 0.2em;
-    margin-left: 1.25em;
-    transform: rotate(-20deg);
-    width: 1.5em;
-    height: 0.8em;
-    border-radius: 50%;
-    background-color: #f69e50;
-  }
-  .a1 {
-    position: relative;
-    top: -102%;
-    left: -130%;
-    width: 12em;
-    height: 5.5em;
-    border-radius: 50px;
-    background-image: linear-gradient(
-      #171717,
-      #171717,
-      #353535,
-      #353535,
-      #171717
-    );
-    transform: rotate(-29deg);
-    clip-path: polygon(50% 0%, 49% 100%, 52% 100%);
-  }
   .a1d {
     position: relative;
     top: -211%;
@@ -580,4 +536,3 @@
       display: none;
     }
   }
-  
