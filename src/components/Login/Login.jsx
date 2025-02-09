@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { auth } from '../../firebaseConfig';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, googleProvider } from '../../firebaseConfig';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import AlertaError from '../Alerta/Error/AlertaError';
 import AlertaExito from '../Alerta/Exito/AlertaExito';
 import AlertaAdvertencia from '../Alerta/Advertencia/AlertaAdvertencia';
+import Loader from '../Loader/Loader';
+import GoogleIcon from '@mui/icons-material/Google';
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -14,6 +16,7 @@ const Login = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [warning, setWarning] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,6 +29,7 @@ const Login = ({ onLogin }) => {
       setWarning('Por favor, ingrese un correo electrónico válido.');
       return;
     }
+    setIsLoading(true);
     try {
       if (isRegister) {
         await createUserWithEmailAndPassword(auth, email, password);
@@ -36,7 +40,26 @@ const Login = ({ onLogin }) => {
       }
       onLogin();
     } catch (error) {
-      setError('Error en la autenticación. Por favor, intente de nuevo.');
+      if (error.code === 'auth/email-already-in-use') {
+        setError('El correo electrónico ya está registrado.');
+      } else {
+        setError('Error en la autenticación. Por favor, intente de nuevo.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      await signInWithPopup(auth, googleProvider);
+      setSuccess('Inicio de sesión con Google exitoso. Bienvenido!');
+      onLogin();
+    } catch (error) {
+      setError('Error en la autenticación con Google. Por favor, intente de nuevo.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -52,12 +75,16 @@ const Login = ({ onLogin }) => {
     setWarning('');
   };
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen" onClick={handleCloseWarning}>
-      <h1 className="text-6xl lg:text-7xl font-bold mb-4">{isRegister ? 'Register' : 'Login'}</h1>
+      <h1 className="text-6xl lg:text-7xl font-bold mb-4">{isRegister ? 'Registro' : 'Inicio de sesión'}</h1>
       <form onSubmit={handleSubmit} className="bg-transparent p-6 rounded-xl border w-100 h-150" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-20 mt-8">
-          <label className="block text-white font-semibold mb-4">Email</label>
+        <div className={isRegister ? 'mb-4' : 'mb-20 mt-8'}>
+          <label className="block text-white font-semibold mb-4">Correo Electrónico</label>
           <input
             type="email"
             value={email}
@@ -66,31 +93,48 @@ const Login = ({ onLogin }) => {
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-white font-semibold mb-4">Password</label>
+        <div className={isRegister ? 'mb-4' : 'mb-20'}>
+          <label className="block text-white font-semibold mb-4">Contraseña</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mb-20 mt-1"
+            className="w-full p-2 border border-gray-300 rounded mt-1"
             required
           />
         </div>
+        {isRegister && (
+          <div className="mb-4">
+            <label className="block text-white font-semibold mb-4">Confirmar contraseña</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded mb-10 mt-1"
+              required
+            />
+          </div>
+        )}
         {error && <AlertaError mensaje={error} onClose={handleCloseError} />}
         {success && <AlertaExito mensaje={success} onClose={handleCloseSuccess} />}
         {warning && <AlertaAdvertencia mensaje={warning} onClose={handleCloseWarning} />}
         <div className="flex justify-center">
           <button type="submit" className="w-50 bg-transparent border text-white p-2 rounded cursor-pointer hover:bg-amber-50 hover:text-black">
-            {isRegister ? 'Register' : 'Login'}
+            {isRegister ? 'Registrarse' : 'Entrar'}
+          </button>
+        </div>
+        <div className="flex justify-center mt-4">
+          <button type="button" onClick={handleGoogleSignIn} className="w-30 bg-transparent border text-white p-2 rounded cursor-pointer hover:bg-amber-50 hover:text-black">
+            <GoogleIcon />
           </button>
         </div>
         <p className="mt-4 text-center">
-          {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
+          {isRegister ? '¿Ya tienes una cuenta?' : "¿No tienes cuenta aún?"}{' '}
           <span
             className="text-blue-500 cursor-pointer"
             onClick={() => setIsRegister(!isRegister)}
           >
-            {isRegister ? 'Login' : 'Register'}
+            {isRegister ? 'Inicia sesión' : 'Regístrate'}
           </span>
         </p>
       </form>

@@ -9,6 +9,7 @@ import FinalizarModal from '../Modales/Finalizar/Finalizar';
 import EditarModal from '../Modales/Editar/Editar';
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
+import Loader from '../Loader/Loader';
 
 const Reloj = () => {
   const [tiempo, setTiempo] = useState(0);
@@ -21,6 +22,7 @@ const Reloj = () => {
   const [inputValue, setInputValue] = useState('');
   const [minutos, setMinutos] = useState(0);
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let cronometro;
@@ -42,6 +44,8 @@ const Reloj = () => {
         setActividades(actividadesData);
       } catch (error) {
         console.error('Error al buscar las actividades: ', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchActivities();
@@ -135,6 +139,10 @@ const Reloj = () => {
       ],
     };
   }, [actividadesAgregadas]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div className='flex flex-col items-center'>
