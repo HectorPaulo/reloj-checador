@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -28,15 +28,13 @@ const App = () => {
   };
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={user ? <Reloj /> : <Login onLogin={handleLogin} />} />
-        <Route path="/about" element={user ? <About /> : <Login onLogin={handleLogin} />} />
-        <Route path="/contacto" element={user ? <Contacto /> : <Login onLogin={handleLogin} />} />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={user ? <Reloj /> : <Login onLogin={handleLogin} />} />
+      <Route path="/about" element={user ? <About /> : <Login onLogin={handleLogin} />} />
+      <Route path="/contacto" element={user ? <Contacto /> : <Login onLogin={handleLogin} />} />
+      <Route path="/login" element={<Login onLogin={handleLogin} />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 };
 
