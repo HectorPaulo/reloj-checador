@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import NavBar from '../Navbar/Navbar';
+import Footer from '../Footer/Footer';
 
 const About = () => {
     return (
@@ -21,6 +22,7 @@ const About = () => {
                 Esperamos que esta aplicación sea útil para aquellos que buscan una manera eficiente de gestionar su tiempo y mejorar su productividad diaria.
             </p>
         </div>
+        <Footer />
         </div>
     );
 };

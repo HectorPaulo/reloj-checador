@@ -8,7 +8,6 @@ import AlertaExito from '../Alerta/Exito/AlertaExito';
 import AlertaAdvertencia from '../Alerta/Advertencia/AlertaAdvertencia';
 import Loader from '../Loader/Loader';
 import GoogleIcon from '@mui/icons-material/Google';
-import './Loader.css';
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');

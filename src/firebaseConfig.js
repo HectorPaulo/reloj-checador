@@ -3,17 +3,16 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAciYIZv1Ug_d34asxn69gxGjBqcknQ0BA",
-  authDomain: "reloj-checador-e9753.firebaseapp.com",
-  projectId: "reloj-checador-e9753",
-  storageBucket: "reloj-checador-e9753.firebasestorage.app",
-  messagingSenderId: "425957436672",
-  appId: "1:425957436672:web:45ed993e2f0b0ca29e97e5"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
-const db = getFirestore(app);
-
 export { auth, googleProvider, db };
