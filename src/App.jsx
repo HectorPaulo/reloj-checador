@@ -34,7 +34,7 @@ const App = () => {
       <Route path="/about" element={user ? <About /> : <Login onLogin={handleLogin} />} />
       <Route path="/contacto" element={user ? <Contacto /> : <Login onLogin={handleLogin} />} />
       <Route path="/listaactividades" element={user ? <ListaActividades /> : <Login onLogin={handleLogin} />} />
-      <Route path="/login" element={<Login onLogin={handleLogin} />} />
+      <Route path="/login" element={user ? <Login onLogin={handleLogin} /> : <Login onLogin={handleLogin}/>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
