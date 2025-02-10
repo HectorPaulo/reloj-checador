@@ -1,7 +1,7 @@
-/* importar los recursos de tailwind */
-
+/* Importar los recursos de Tailwind CSS */
 @import "tailwindcss";
 
+/* Definir la animación slide-in-out */
 @keyframes slide-in-out {
   0% {
     transform: translateX(-100%);
@@ -15,17 +15,19 @@
   }
 }
 
+/* Aplicar la animación slide-in-out a los elementos con la clase .animate-slide-in-out */
 .animate-slide-in-out {
   animation: slide-in-out 5s ease-in-out;
 }
 
-/* estilos para hacer el fondo oscuro */
+/* Estilos para hacer el fondo oscuro por defecto */
 :root {
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 }
 
+/* Estilos para el fondo claro cuando se prefiere el esquema de color claro */
 @media (prefers-color-scheme: light) {
   :root {
     background-color: #ffffff;

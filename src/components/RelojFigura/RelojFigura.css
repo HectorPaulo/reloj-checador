@@ -1,110 +1,109 @@
 .face {
-    position: relative;
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    outline: 10px solid #333;
+    position: relative; /* Posiciona el elemento relativamente a su contenedor */
+    width: 180px; /* Ancho del reloj */
+    height: 180px; /* Altura del reloj */
+    border-radius: 50%; /* Hace que el reloj sea circular */
+    outline: 10px solid #333; /* Borde exterior del reloj */
     background: repeating-radial-gradient(circle at 50% 50%, 
     rgba(200,200,200,.2) 0%, rgba(200,200,200,.2) 2%, 
     transparent 2%, transparent 3%, rgba(200,200,200,.2) 3%, 
     transparent 3%), conic-gradient(white 0%, silver 10%, 
     white 35%, silver 45%, white 60%, silver 70%, 
-    white 80%, silver 95%, white 100%);
-    box-shadow: inset 0 0 20px #0007;
-  }
+    white 80%, silver 95%, white 100%); /* Fondo del reloj con gradientes */
+    box-shadow: inset 0 0 20px #0007; /* Sombra interior del reloj */
+}
   
-  .hour {
-    position: absolute;
-    width: 5px;
-    height: 60px;
-    background: #aaa;
-    left: 87.5px;
-    top: 43px;
-    border-radius: 3px 3px 1px 1px;
-    transform-origin: 2px 47px;
-    box-shadow: 0 0 5px #0005,inset 1.5px 3px 0px #333, inset -1.5px -3px 0px #333;
-    z-index: 1;
-    animation: watch 43200s linear infinite;
-  }
+.hour {
+    position: absolute; /* Posiciona el elemento absolutamente dentro del contenedor */
+    width: 5px; /* Ancho de la manecilla de la hora */
+    height: 60px; /* Altura de la manecilla de la hora */
+    background: #aaa; /* Color de fondo de la manecilla de la hora */
+    left: 87.5px; /* Posición horizontal de la manecilla de la hora */
+    top: 43px; /* Posición vertical de la manecilla de la hora */
+    border-radius: 3px 3px 1px 1px; /* Bordes redondeados de la manecilla de la hora */
+    transform-origin: 2px 47px; /* Punto de origen para la transformación */
+    box-shadow: 0 0 5px #0005,inset 1.5px 3px 0px #333, inset -1.5px -3px 0px #333; /* Sombra de la manecilla de la hora */
+    z-index: 1; /* Nivel de apilamiento de la manecilla de la hora */
+    animation: watch 43200s linear infinite; /* Animación de rotación de la manecilla de la hora */
+}
   
-  .minute {
-    position: absolute;
-    width: 4px;
-    height: 78px;
-    background: #aaa;
-    left: 88px;
-    top: 25px;
-    border-radius: 3px 3px 1px 1px;
-    transform-origin: 2px 65px;
-    box-shadow: 0 0 5px #0005, inset 1.5px 3px 0px #333, inset -1.5px -3px 0px #333;
-    z-index: 2;
-    animation: watch 3600s linear infinite;
-  }
+.minute {
+    position: absolute; /* Posiciona el elemento absolutamente dentro del contenedor */
+    width: 4px; /* Ancho de la manecilla de los minutos */
+    height: 78px; /* Altura de la manecilla de los minutos */
+    background: #aaa; /* Color de fondo de la manecilla de los minutos */
+    left: 88px; /* Posición horizontal de la manecilla de los minutos */
+    top: 25px; /* Posición vertical de la manecilla de los minutos */
+    border-radius: 3px 3px 1px 1px; /* Bordes redondeados de la manecilla de los minutos */
+    transform-origin: 2px 65px; /* Punto de origen para la transformación */
+    box-shadow: 0 0 5px #0005, inset 1.5px 3px 0px #333, inset -1.5px -3px 0px #333; /* Sombra de la manecilla de los minutos */
+    z-index: 2; /* Nivel de apilamiento de la manecilla de los minutos */
+    animation: watch 3600s linear infinite; /* Animación de rotación de la manecilla de los minutos */
+}
   
-  .second {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: red;
-    left: 85px;
-    top: 85px;
-    border-radius: 50%;
-    border: 1px solid #eee;
-    z-index: 3;
-    animation: watch 60s steps(60, end) 0s infinite;
-  }
+.second {
+    position: absolute; /* Posiciona el elemento absolutamente dentro del contenedor */
+    width: 10px; /* Ancho del punto central de la manecilla de los segundos */
+    height: 10px; /* Altura del punto central de la manecilla de los segundos */
+    background: red; /* Color de fondo del punto central de la manecilla de los segundos */
+    left: 85px; /* Posición horizontal del punto central de la manecilla de los segundos */
+    top: 85px; /* Posición vertical del punto central de la manecilla de los segundos */
+    border-radius: 50%; /* Hace que el punto central sea circular */
+    border: 1px solid #eee; /* Borde del punto central */
+    z-index: 3; /* Nivel de apilamiento del punto central */
+    animation: watch 60s steps(60, end) 0s infinite; /* Animación de rotación de la manecilla de los segundos */
+}
   
-  .second::before {
-    content: "";
-    position: absolute;
-    width: 1px;
-    height: 85px;
-    left: 3px;
-    bottom: -10px;
-    background: red;
-    border-radius: 2px;
-    box-shadow: 5px 0 2px rgba(128, 128, 128, 0.2);
-  }
+.second::before {
+    content: ""; /* Contenido vacío para el pseudo-elemento */
+    position: absolute; /* Posiciona el pseudo-elemento absolutamente dentro del contenedor */
+    width: 1px; /* Ancho de la manecilla de los segundos */
+    height: 85px; /* Altura de la manecilla de los segundos */
+    left: 3px; /* Posición horizontal de la manecilla de los segundos */
+    bottom: -10px; /* Posición vertical de la manecilla de los segundos */
+    background: red; /* Color de fondo de la manecilla de los segundos */
+    border-radius: 2px; /* Bordes redondeados de la manecilla de los segundos */
+    box-shadow: 5px 0 2px rgba(128, 128, 128, 0.2); /* Sombra de la manecilla de los segundos */
+}
   
-  .second::after {
-    content: "";
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    left: 2px;
-    top: 2px;
-    background: #555;
-    border-radius: 50%;
-  }
+.second::after {
+    content: ""; /* Contenido vacío para el pseudo-elemento */
+    position: absolute; /* Posiciona el pseudo-elemento absolutamente dentro del contenedor */
+    width: 4px; /* Ancho del punto central de la manecilla de los segundos */
+    height: 4px; /* Altura del punto central de la manecilla de los segundos */
+    left: 2px; /* Posición horizontal del punto central de la manecilla de los segundos */
+    top: 2px; /* Posición vertical del punto central de la manecilla de los segundos */
+    background: #555; /* Color de fondo del punto central de la manecilla de los segundos */
+    border-radius: 50%; /* Hace que el punto central sea circular */
+}
   
-  .v-index {
-    position: absolute;
-    color: #333;
-    font-size: 24px;
-    left: 83.5px;
-    top: -3px;
-    text-shadow: 0 157px 0 #333;
-    z-index: 1
-  }
+.v-index {
+    position: absolute; /* Posiciona el elemento absolutamente dentro del contenedor */
+    color: #333; /* Color del texto */
+    font-size: 24px; /* Tamaño de la fuente */
+    left: 83.5px; /* Posición horizontal del índice vertical */
+    top: -3px; /* Posición vertical del índice vertical */
+    text-shadow: 0 157px 0 #333; /* Sombra del texto */
+    z-index: 1; /* Nivel de apilamiento del índice vertical */
+}
   
-  .h-index {
-    position: absolute;
-    color: #333;
-    font-size: 24px;
-    top: 72px;
-    left: 5px;
-    transform: rotate(-90deg);
-    text-shadow: 0 158px 0 #333;
-    z-index: 1;
-  }
+.h-index {
+    position: absolute; /* Posiciona el elemento absolutamente dentro del contenedor */
+    color: #333; /* Color del texto */
+    font-size: 24px; /* Tamaño de la fuente */
+    top: 72px; /* Posición vertical del índice horizontal */
+    left: 5px; /* Posición horizontal del índice horizontal */
+    transform: rotate(-90deg); /* Rota el índice horizontal */
+    text-shadow: 0 158px 0 #333; /* Sombra del texto */
+    z-index: 1; /* Nivel de apilamiento del índice horizontal */
+}
   
-  @keyframes watch {
+@keyframes watch {
     0% {
-      transform: rotate(0deg);
+      transform: rotate(0deg); /* Estado inicial de la animación */
     }
   
     100% {
-      transform: rotate(360deg);
+      transform: rotate(360deg); /* Estado final de la animación */
     }
-  }
-  
+}

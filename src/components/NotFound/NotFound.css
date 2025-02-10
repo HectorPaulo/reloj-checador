@@ -12,28 +12,6 @@
   align-items: center;
   justify-content: center;
 }
-
-.antenna {
-  /* Estilos para la antena */
-}
-
-.antenna_shadow {
-  /* Estilos para la sombra de la antena */
-}
-
-.antenna::after {
-  /* Estilos para el pseudo-elemento after de la antena */
-}
-
-.antenna::before {
-  /* Estilos para el pseudo-elemento before de la antena */
-}
-
-.a1 {
-  /* Estilos para el elemento a1 */
-}
-
-/* Agrega aquí los estilos adicionales necesarios para los otros elementos */
   
   .a1d {
     position: relative;
