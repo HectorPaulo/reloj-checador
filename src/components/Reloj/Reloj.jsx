@@ -1,17 +1,38 @@
 /* eslint-disable no-unused-vars */
+// Desactiva la regla de ESLint que marca las variables no utilizadas como error.
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { db } from '../../firebaseConfig';
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import PropTypes from 'prop-types';
+// Importa React y varios hooks de React.
+
+import { db, auth } from '../../firebaseConfig';
+// Importa la configuración de Firebase.
+
+import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
+// Importa funciones de Firestore para interactuar con la base de datos.
+
 import { Bar } from 'react-chartjs-2';
+// Importa el componente de gráfico de barras de react-chartjs-2.
+
 import 'chart.js/auto';
+// Importa la configuración automática de Chart.js.
+
 import IniciarModal from '../Modales/Iniciar/Iniciar';
 import FinalizarModal from '../Modales/Finalizar/Finalizar';
 import EditarModal from '../Modales/Editar/Editar';
+// Importa componentes modales personalizados.
+
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import Loader from '../Loader/Loader';
+// Importa componentes de la interfaz de usuario.
+
+import { useParams } from 'react-router-dom';
 
 const Reloj = () => {
+// Define el componente funcional Reloj que recibe projectId como prop.
+
+  const { projectId } = useParams();
   const [tiempo, setTiempo] = useState(0);
   const [isRelojActivo, setIsRelojActivo] = useState(false);
   const [actividad, setActividad] = useState('');
@@ -23,6 +44,7 @@ const Reloj = () => {
   const [minutos, setMinutos] = useState(0);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+// Define varios estados usando el hook useState.
 
   useEffect(() => {
     let cronometro;
@@ -35,46 +57,62 @@ const Reloj = () => {
     }
     return () => clearInterval(cronometro);
   }, [isRelojActivo, tiempo]);
+// Usa useEffect para manejar el cronómetro, incrementando el tiempo cada segundo cuando el reloj está activo.
 
   useEffect(() => {
-    const fetchActivities = async () => {
+    const fetchactividades = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'actividades'));
-        const actividadesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setActividades(actividadesData);
+        const user = auth.currentUser;
+        if (user) {
+          const actividadesQuery = query(
+            collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
+          );
+          const querySnapshot = await getDocs(actividadesQuery);
+          const actividadesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setActividades(actividadesData);
+        }
       } catch (error) {
         console.error('Error al buscar las actividades: ', error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchActivities();
-  }, []);
+    fetchactividades();
+  }, [projectId]);
+// Usa useEffect para obtener las actividades del proyecto desde Firestore cuando el componente se monta o el projectId cambia.
 
   const handleStart = useCallback(() => {
     setModalIsOpen(true);
   }, []);
+// Define una función para abrir el modal de inicio usando useCallback.
 
   const handleStop = useCallback(async () => {
     setIsRelojActivo(false);
     const minutos = Math.floor(tiempo / 60);
     setMinutos(minutos);
     try {
-      await addDoc(collection(db, 'actividades'), {
-        actividad: actividad,
-        minutos: minutos,
-        marcaTiempo: new Date(),
-      });
-      const querySnapshot = await getDocs(collection(db, 'actividades'));
-      const activitiesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setActividades(activitiesData);
+      const user = auth.currentUser;
+      if (user) {
+        await addDoc(collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades'), {
+          actividad: actividad,
+          minutos: minutos,
+          marcaTiempo: new Date(),
+        });
+        const actividadesQuery = query(
+          collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
+        );
+        const querySnapshot = await getDocs(actividadesQuery);
+        const actividadesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setActividades(actividadesData);
+      }
     } catch (e) {
       console.error('Ha ocurrido un error al intentar agregar el documento: ', e);
     }
     setTiempo(0);
     setActividad('');
     setFinalizarModalIsOpen(true);
-  }, [actividad, tiempo]);
+  }, [actividad, tiempo, projectId]);
+// Define una función para detener el reloj, guardar la actividad en Firestore y abrir el modal de finalización usando useCallback.
 
   const handleModalSubmit = useCallback(() => {
     setActividad(inputValue);
@@ -82,37 +120,53 @@ const Reloj = () => {
     setModalIsOpen(false);
     setInputValue('');
   }, [inputValue]);
+// Define una función para manejar el envío del modal de inicio usando useCallback.
 
   const handleEdit = useCallback((activity) => {
     setSelectedActivity(activity);
     setInputValue(activity.actividad);
     setEditarModalIsOpen(true);
   }, []);
+// Define una función para abrir el modal de edición con la actividad seleccionada usando useCallback.
 
   const handleEditSubmit = useCallback(async () => {
     try {
-      const activityRef = doc(db, 'actividades', selectedActivity.id);
-      await updateDoc(activityRef, { actividad: inputValue });
-      const querySnapshot = await getDocs(collection(db, 'actividades'));
-      const activitiesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setActividades(activitiesData);
+      const user = auth.currentUser;
+      if (user) {
+        const activityRef = doc(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades', selectedActivity.id);
+        await updateDoc(activityRef, { actividad: inputValue });
+        const actividadesQuery = query(
+          collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
+        );
+        const querySnapshot = await getDocs(actividadesQuery);
+        const actividadesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setActividades(actividadesData);
+      }
     } catch (e) {
       console.error('Ha ocurrido un error al intentar actualizar el documento: ', e);
     }
     setEditarModalIsOpen(false);
     setInputValue('');
-  }, [inputValue, selectedActivity]);
+  }, [inputValue, selectedActivity, projectId]);
+// Define una función para manejar el envío del modal de edición y actualizar la actividad en Firestore usando useCallback.
 
   const handleDelete = useCallback(async (id) => {
     try {
-      await deleteDoc(doc(db, 'actividades', id));
-      const querySnapshot = await getDocs(collection(db, 'actividades'));
-      const activitiesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setActividades(activitiesData);
+      const user = auth.currentUser;
+      if (user) {
+        await deleteDoc(doc(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades', id));
+        const actividadesQuery = query(
+          collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
+        );
+        const querySnapshot = await getDocs(actividadesQuery);
+        const actividadesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setActividades(actividadesData);
+      }
     } catch (e) {
       console.error('Ha ocurrido un error al intentar eliminar el documento: ', e);
     }
-  }, []);
+  }, [projectId]);
+// Define una función para eliminar una actividad de Firestore usando useCallback.
 
   const actividadesAgregadas = useMemo(() => {
     const agregado = actividades.reduce((acc, curr) => {
@@ -126,6 +180,7 @@ const Reloj = () => {
     }, {});
     return agregado;
   }, [actividades]);
+// Usa useMemo para calcular el total de minutos por actividad agrupados por fecha.
 
   const agregadoData = useMemo(() => {
     return {
@@ -139,10 +194,12 @@ const Reloj = () => {
       ],
     };
   }, [actividadesAgregadas]);
+// Usa useMemo para preparar los datos del gráfico de barras.
 
   if (isLoading) {
     return <Loader />;
   }
+// Muestra un componente Loader mientras los datos se están cargando.
 
   return (
     <div className='flex flex-col items-center'>
@@ -198,7 +255,9 @@ const Reloj = () => {
       />
       <Footer />
     </div>
-  );
+// Renderiza el componente, incluyendo el NavBar, el cronómetro, botones de inicio/parada, lista de actividades, gráfico de barras y modales.
+        );
 };
 
 export default Reloj;
+// Exporta el componente Reloj como el valor por defecto del módulo.
