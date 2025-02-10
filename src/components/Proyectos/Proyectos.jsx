@@ -1,15 +1,17 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { db, auth } from '../../firebaseConfig';
-import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc, query, where } from 'firebase/firestore';
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import Loader from '../Loader/Loader';
-import ProjectChart from '../ProjectChart/ProjectChart';
+import { Bar } from 'react-chartjs-2';
+import 'chart.js/auto';
 
 const Proyectos = ({ onSelectProject }) => {
   const [proyectos, setProyectos] = useState([]);
+  const [actividades, setActividades] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
 
@@ -22,6 +24,17 @@ const Proyectos = ({ onSelectProject }) => {
           const querySnapshot = await getDocs(projectsQuery);
           const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setProyectos(proyectosData);
+
+          // Fetch actividades for each project
+          const actividadesData = {};
+          for (const project of proyectosData) {
+            const actividadesQuery = query(
+              collection(db, 'usuarios', user.uid, 'proyectos', project.id, 'actividades')
+            );
+            const actividadesSnapshot = await getDocs(actividadesQuery);
+            actividadesData[project.id] = actividadesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          }
+          setActividades(actividadesData);
         }
       } catch (error) {
         console.error('Error al buscar los proyectos: ', error);
@@ -68,6 +81,38 @@ const Proyectos = ({ onSelectProject }) => {
     }
   }, []);
 
+  const actividadesAgregadas = useMemo(() => {
+    const agregado = {};
+    for (const projectId in actividades) {
+      agregado[projectId] = actividades[projectId].reduce((acc, curr) => {
+        const llave = curr.actividad;
+        if (!acc[llave]) {
+          acc[llave] = 0;
+        }
+        acc[llave] += curr.minutos;
+        return acc;
+      }, {});
+    }
+    return agregado;
+  }, [actividades]);
+
+  const agregadoData = useMemo(() => {
+    const data = {};
+    for (const projectId in actividadesAgregadas) {
+      data[projectId] = {
+        labels: Object.keys(actividadesAgregadas[projectId]),
+        datasets: [
+          {
+            label: 'Minutos por actividad',
+            data: Object.values(actividadesAgregadas[projectId]),
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          },
+        ],
+      };
+    }
+    return data;
+  }, [actividadesAgregadas]);
+
   if (isLoading) {
     return <Loader />;
   }
@@ -101,14 +146,12 @@ const Proyectos = ({ onSelectProject }) => {
             <button onClick={handleAddProject} className="w-50 px-6 py-3 my-4 bg-transparent border text-white cursor-pointer rounded hover:bg-white hover:text-black hover:scale-110">Agregar</button>
           </div>
         </div>
-        <div className='w-full max-w-2xl mx-auto mt-8'>
-          {proyectos.map((project) => (
-            <div key={project.id} className="mb-8">
-              <h2 className="text-2xl font-bold text-center">{project.nombre}</h2>
-              <ProjectChart activities={project.actividades || []} />
-            </div>
-          ))}
-        </div>
+        {proyectos.map((project) => (
+          <div key={project.id} className='w-full max-w-2xl mx-auto mt-8'>
+            <h2 className="text-2xl font-bold text-center">Gráfica de Actividades - {project.nombre}</h2>
+            <Bar data={agregadoData[project.id]} />
+          </div>
+        ))}
       </div>
       <Footer />
     </div>

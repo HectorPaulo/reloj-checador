@@ -40,7 +40,7 @@ const Login = ({ onLogin }) => {
       }
       onLogin();
     } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
+      if (error.code === 'authemail-already-in-use') {
         setError('El correo electrónico ya está registrado.');
       } else {
         setError('Error en la autenticación. Por favor, intente de nuevo.');
@@ -80,11 +80,11 @@ const Login = ({ onLogin }) => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen" onClick={handleCloseWarning}>
-      <h1 className="text-6xl mb-20 lg:text-5xl font-bold ">{isRegister ? 'Registro' : 'Inicio de sesión'}</h1>
-      <form onSubmit={handleSubmit} className="bg-transparent p-6 rounded-xl border w-100 h-150" onClick={(e) => e.stopPropagation()}>
-        <div className={isRegister ? 'mb-4' : 'mb-20 mt-8'}>
-          <label className="block text-white font-semibold mb-4">Correo Electrónico</label>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-0" onClick={handleCloseWarning}>
+      <h1 className="text-4xl mb-10 lg:text-5xl text-center font-bold ">{isRegister ? 'Registro' : 'Inicio de sesión'}</h1>
+      <form onSubmit={handleSubmit} className="bg-transparent p-6 rounded-xl border w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+        <div className={isRegister ? 'mb-4' : 'mb-8 mt-4'}>
+          <label className="block text-white font-semibold mb-2">Correo Electrónico</label>
           <input
             type="email"
             value={email}
@@ -93,8 +93,8 @@ const Login = ({ onLogin }) => {
             required
           />
         </div>
-        <div className={isRegister ? 'mb-4' : 'mb-20'}>
-          <label className="block text-white font-semibold mb-4">Contraseña</label>
+        <div className={isRegister ? 'mb-4' : 'mb-8'}>
+          <label className="block text-white font-semibold mb-2">Contraseña</label>
           <input
             type="password"
             value={password}
@@ -105,12 +105,12 @@ const Login = ({ onLogin }) => {
         </div>
         {isRegister && (
           <div className="mb-4">
-            <label className="block text-white font-semibold mb-4">Confirmar contraseña</label>
+            <label className="block text-white font-semibold mb-2">Confirmar contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mb-10 mt-1"
+              className="w-full p-2 border border-gray-300 rounded mb-4 mt-1"
               required
             />
           </div>
@@ -119,12 +119,12 @@ const Login = ({ onLogin }) => {
         {success && <AlertaExito mensaje={success} onClose={handleCloseSuccess} />}
         {warning && <AlertaAdvertencia mensaje={warning} onClose={handleCloseWarning} />}
         <div className="flex justify-center">
-          <button type="submit" className="w-50 bg-transparent border text-white p-2 rounded cursor-pointer hover:bg-amber-50 hover:text-black">
+          <button type="submit" className="w-full bg-transparent border text-white p-2 rounded cursor-pointer hover:bg-amber-50 hover:text-black">
             {isRegister ? 'Registrarse' : 'Entrar'}
           </button>
         </div>
         <div className="flex justify-center mt-4">
-          <button type="button" onClick={handleGoogleSignIn} className="w-30 bg-transparent border text-white p-2 rounded cursor-pointer hover:bg-amber-50 hover:text-black">
+          <button type="button" onClick={handleGoogleSignIn} className="w-full bg-transparent border text-white p-2 rounded cursor-pointer hover:bg-amber-50 hover:text-black">
             <GoogleIcon />
           </button>
         </div>
