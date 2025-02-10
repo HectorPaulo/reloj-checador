@@ -8,14 +8,17 @@ import Contacto from './components/Contacto/Contacto';
 import NotFound from './components/NotFound/NotFound';
 import Login from './components/Login/Login';
 import ListaActividades from './components/ListaActividades/ListaActividades';
+import Loader from './components/Loader/Loader';
 
 const App = () => {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
+      setIsLoading(false);
       if (!user) {
         navigate('/login');
       }
@@ -28,13 +31,17 @@ const App = () => {
     navigate('/');
   };
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <Routes>
       <Route path="/" element={user ? <Reloj /> : <Login onLogin={handleLogin} />} />
       <Route path="/about" element={user ? <About /> : <Login onLogin={handleLogin} />} />
       <Route path="/contacto" element={user ? <Contacto /> : <Login onLogin={handleLogin} />} />
       <Route path="/listaactividades" element={user ? <ListaActividades /> : <Login onLogin={handleLogin} />} />
-      <Route path="/login" element={user ? <Login onLogin={handleLogin} /> : <Login onLogin={handleLogin}/>} />
+      <Route path="/login" element={<Login onLogin={handleLogin} />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
