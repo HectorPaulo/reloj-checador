@@ -81,7 +81,7 @@ const Login = ({ onLogin }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen" onClick={handleCloseWarning}>
-      <h1 className="text-6xl lg:text-7xl font-bold mb-4">{isRegister ? 'Registro' : 'Inicio de sesión'}</h1>
+      <h1 className="text-6xl mb-20 lg:text-5xl font-bold ">{isRegister ? 'Registro' : 'Inicio de sesión'}</h1>
       <form onSubmit={handleSubmit} className="bg-transparent p-6 rounded-xl border w-100 h-150" onClick={(e) => e.stopPropagation()}>
         <div className={isRegister ? 'mb-4' : 'mb-20 mt-8'}>
           <label className="block text-white font-semibold mb-4">Correo Electrónico</label>

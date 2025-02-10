@@ -1,11 +1,20 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { getAuth, signOut } from 'firebase/auth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [dateTime, setDateTime] = useState(new Date());
     const navigate = useNavigate();
     const auth = getAuth();
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setDateTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -19,18 +28,21 @@ const NavBar = () => {
     return (
         <nav className='bg-transparent p-6'>
             <div className='flex justify-between items-center'>
+                <div className='font-semibold text-xl text-white'>
+                    <p>Hoy es</p>{dateTime.toLocaleDateString()} a las {dateTime.toLocaleTimeString()}
+                </div>
                 <div className='md:hidden'>
                     <button onClick={() => setIsOpen(!isOpen)} className='text-white focus:outline-none'>
-                        <svg className='w-6 cursor-pointer h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                        <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d={isOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16m-7 6h7'}></path>
                         </svg>
                     </button>
                 </div>
-                <div className='w-full md:flex md:justify-end'>
-                    <ul className={`md:flex md:items-center md:gap-3 ${isOpen ? 'block' : 'hidden'} md:block`}>
+                <div className={`w-full md:flex md:justify-end ${isOpen ? 'block' : 'hidden'} md:block`}>
+                    <ul className='md:flex md:items-center md:gap-6'>
                         <li>
                             <Link to='/' className='block mt-4 md:inline-block md:mt-0 font-semibold text-xl text-white hover:scale-110 hover:text-gray-500'>
-                                Reloj
+                                Dashboard
                             </Link>
                         </li>
                         <li>
@@ -44,8 +56,8 @@ const NavBar = () => {
                             </Link>
                         </li>
                         <li>
-                            <Link to='/ListaActividades' className='block mt-4 md:inline-block md:mt-0 font-semibold text-xl text-white hover:scale-110 hover:text-gray-500'>
-                                Lista de Actividades
+                            <Link to='/Proyectos' className='block mt-4 md:inline-block md:mt-0 font-semibold text-xl text-white hover:scale-110 hover:text-gray-500'>
+                                Proyectos
                             </Link>
                         </li>
                         <li>
