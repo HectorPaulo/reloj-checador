@@ -14,7 +14,7 @@ const IniciarModal = ({ isOpen, onRequestClose, inputValue, setInputValue, handl
         if (inputValue.trim() === '') { // Si el valor del input está vacío
           setError('El nombre de la actividad no puede estar vacío'); // Muestra un mensaje de error
         } else {
-          handleModalSubmit(); // Llama a la función de envío del modal
+          handleModalSubmit(inputValue); // Llama a la función de envío del modal con el valor del input
         }
       } else if (e.key === 'Escape') { // Si la tecla presionada es Escape
         onRequestClose(); // Cierra el modal
@@ -39,7 +39,7 @@ const IniciarModal = ({ isOpen, onRequestClose, inputValue, setInputValue, handl
     if (inputValue.trim() === '') { // Si el valor del input está vacío
       setError('El nombre de la actividad no puede estar vacío'); // Muestra un mensaje de error
     } else {
-      handleModalSubmit(); // Llama a la función de envío del modal
+      handleModalSubmit(inputValue); // Llama a la función de envío del modal con el valor del input
       setError(''); // Limpia el mensaje de error
     }
   };
@@ -53,13 +53,21 @@ const IniciarModal = ({ isOpen, onRequestClose, inputValue, setInputValue, handl
       overlayClassName="fixed inset-0 bg-opacity-50 flex items-center justify-center backdrop-blur-sm" // Clases de estilo para el overlay
     >
       <h2 className="text-white text-xl font-semibold mb-4">Ingrese el nombre de la actividad</h2> {/* Título del modal */}
-      <input
+      <select
         ref={inputRef} // Referencia del input
-        type="text" // Tipo de input
         value={inputValue} // Valor del input
         onChange={(e) => setInputValue(e.target.value)} // Maneja el cambio del input
         className="w-full p-2 mb-4 border border-gray-300 rounded-lg bg-white text-black" // Clases de estilo para el input
-      />
+      >
+        <option value="">Seleccione una opción</option>
+        <option value="Planificación">Planificación</option>
+        <option value="Análisis">Análisis</option>
+        <option value="Codificación">Codificación</option>
+        <option value="Pruebas">Pruebas</option>
+        <option value="Lanzamiento">Lanzamiento</option>
+        <option value="Revision">Revisión</option>
+        <option value="RevisionCodigo">Revisión del código</option>
+      </select>
       {error && <p className="text-red-500 mb-4">{error}</p>} {/* Muestra el mensaje de error si existe */}
       <button onClick={handleSubmit} className="px-6 py-2 bg-transparent border text-white cursor-pointer rounded hover:bg-white hover:text-black hover:scale-110">Iniciar</button> {/* Botón para iniciar */}
     </Modal>

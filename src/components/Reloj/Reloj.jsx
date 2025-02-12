@@ -1,6 +1,10 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Importa React y hooks
 import PropTypes from 'prop-types'; // Importa PropTypes para validación de tipos
+import html2canvas from 'html2canvas'; // Importa librería para capturar contenido de un div
+import { jsPDF } from 'jspdf'; // Importa librería para crear PDFs
+import { Chart, BarController, CategoryScale, LinearScale, BarElement } from 'chart.js';
+import 'jspdf-autotable'; // Importa librería para crear tablas en PDFs
 import { db, auth } from '../../firebaseConfig'; // Importa configuración de Firebase
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore'; // Importa funciones de Firestore
 import { Bar } from 'react-chartjs-2'; // Importa componente de gráfico de barras
@@ -135,10 +139,78 @@ const Reloj = () => {
     setStartTime(new Date()); // Establece la hora de inicio
   }, [inputValue]);
 
-  const handleEdit = useCallback((activity) => {
-    setSelectedActivity(activity); // Establece la actividad seleccionada
-    setInputValue(activity.actividad); // Establece el valor del input desde la actividad
-    setEditarModalIsOpen(true); // Abre el modal de edición
+  const handleDownload = useCallback(async (activity) => {
+    // Crear un nuevo PDF
+    const pdf = new jsPDF();
+  
+    // Título del PDF
+    pdf.setFontSize(18);
+    pdf.text('Detalles de la Actividad', 10, 10);
+  
+    // Datos de la actividad en formato de tabla
+    const data = [
+      ['Actividad', activity.actividad],
+      ['Minutos', activity.minutos],
+      ['Fecha', activity.fecha],
+      ['Hora de Inicio', activity.horaInicio],
+      ['Hora de Finalización', activity.horaFinal],
+      ['Interrupción', activity.interrupcion],
+      ['Comentarios', activity.comentarios],
+    ];
+  
+    // Crear la tabla
+    pdf.autoTable({
+      startY: 20, // Posición Y donde comienza la tabla
+      head: [['Campo', 'Valor']], // Encabezados de la tabla
+      body: data, // Datos de la tabla
+      theme: 'grid', // Estilo de la tabla
+    });
+  
+    // Crear un canvas temporal para la gráfica
+    const canvas = document.createElement('canvas');
+    canvas.width = 400; // Ancho del canvas
+    canvas.height = 200; // Alto del canvas
+    document.body.appendChild(canvas); // Agrega el canvas al DOM temporalmente
+  
+    // Configuración de la gráfica de barras
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [activity.actividad], // Nombre de la actividad
+        datasets: [
+          {
+            label: 'Minutos',
+            data: [activity.minutos], // Minutos de la actividad
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  
+    // Captura la gráfica como imagen
+    const chartImage = await html2canvas(canvas);
+    const chartImgData = chartImage.toDataURL('image/png');
+  
+    // Agrega la gráfica al PDF
+    const imgWidth = 180; // Ancho de la imagen en el PDF
+    const imgHeight = (chartImage.height * imgWidth) / chartImage.width; // Altura proporcional
+    pdf.addImage(chartImgData, 'PNG', 10, pdf.autoTable.previous.finalY + 10, imgWidth, imgHeight);
+  
+    // Guardar el PDF
+    pdf.save('actividad.pdf');
+  
+    // Limpiar el canvas temporal
+    document.body.removeChild(canvas);
   }, []);
 
   const handleEditSubmit = useCallback(async () => {
@@ -208,7 +280,7 @@ const Reloj = () => {
     }, {});
     return agregado;
   }, [actividades]);
-
+  
   const agregadoData = useMemo(() => {
     return {
       labels: Object.keys(actividadesAgregadas), // Etiquetas de las actividades
@@ -221,6 +293,7 @@ const Reloj = () => {
       ],
     };
   }, [actividadesAgregadas]);
+  
 
   if (isLoading) {
     return <Loader />; // Muestra el cargador si está cargando
@@ -250,6 +323,9 @@ const Reloj = () => {
             <li key={activity.id} className='flex justify-between items-center p-2 border-b'>
               <span>{activity.actividad}</span>
               <div>
+                <button className='cursor-pointer hover:scale-110 mx-2 sm:mx-4' onClick={() => handleDownload(activity)}>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg>
+                </button>
                 <button className='cursor-pointer hover:scale-110 mx-2 sm:mx-4' onClick={() => handleDetalles(activity)}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg></button> {/* Botón para ver detalles de la actividad */}
                 <button className='cursor-pointer hover:scale-110 mx-2 sm:mx-4' onClick={() => handleEdit(activity)}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg></button> {/* Botón para editar la actividad */}
                 <button className='cursor-pointer hover:scale-110 mx-2 sm:mx-4' onClick={() => handleDelete(activity.id)}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg></button> {/* Botón para eliminar la actividad */}
