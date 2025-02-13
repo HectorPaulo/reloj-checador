@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-// Importing necessary libraries and components
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { db, auth } from '../../firebaseConfig';
@@ -10,110 +9,111 @@ import Loader from '../Loader/Loader';
 import { Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
 
-// Component definition
+// Definición del componente
 const Proyectos = ({ onSelectProject }) => {
-  // State variables
-  const [proyectos, setProyectos] = useState([]); // Stores the list of projects
-  const [actividades, setActividades] = useState({}); // Stores activities for each project
-  const [isLoading, setIsLoading] = useState(true); // Loading state
-  const [inputValue, setInputValue] = useState(''); // Input value for new project
+  // Variables de estado
+  const [proyectos, setProyectos] = useState([]); // Almacena la lista de proyectos
+  const [actividades, setActividades] = useState({}); // Almacena actividades para cada proyecto
+  const [isLoading, setIsLoading] = useState(true); // Estado de carga
+  const [inputValue, setInputValue] = useState(''); // Valor del input para nuevo proyecto
 
-  // Fetch projects and activities on component mount
+  // Obtener proyectos y actividades al montar el componente
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const user = auth.currentUser; // Get current user
+        const user = auth.currentUser; // Obtener usuario actual
         if (user) {
-          const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Query for user's projects
-          const querySnapshot = await getDocs(projectsQuery); // Fetch projects
-          const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Map projects data
-          setProyectos(proyectosData); // Set projects state
+          const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
+          const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
+          const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
+          setProyectos(proyectosData); // Establecer estado de proyectos
 
-          // Fetch activities for each project
+          // Obtener actividades para cada proyecto
           const actividadesData = {};
           for (const project of proyectosData) {
             const actividadesQuery = query(
               collection(db, 'usuarios', user.uid, 'proyectos', project.id, 'actividades')
             );
-            const actividadesSnapshot = await getDocs(actividadesQuery); // Fetch activities
-            actividadesData[project.id] = actividadesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Map activities data
+            const actividadesSnapshot = await getDocs(actividadesQuery); // Obtener actividades
+            actividadesData[project.id] = actividadesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de actividades
           }
-          setActividades(actividadesData); // Set activities state
+          setActividades(actividadesData); // Establecer estado de actividades
         }
       } catch (error) {
-        console.error('Error al buscar los proyectos: ', error); // Log error
+        console.error('Error al buscar los proyectos: ', error); // Registrar error
       } finally {
-        setIsLoading(false); // Set loading state to false
+        setIsLoading(false); // Establecer estado de carga a falso
       }
     };
-    fetchProjects(); // Call fetchProjects function
+    fetchProjects(); // Llamar a la función fetchProjects
   }, []);
 
-  // Function to add a new project
+  // Función para agregar un nuevo proyecto
   const handleAddProject = useCallback(async () => {
     if (inputValue.trim() === '') {
-      return; // Do nothing if input is empty
+      return; // No hacer nada si el input está vacío
     }
     try {
-      const user = auth.currentUser; // Get current user
+      const user = auth.currentUser; // Obtener usuario actual
       if (user) {
-        await addDoc(collection(db, 'usuarios', user.uid, 'proyectos'), {
-          nombre: inputValue, // Add new project with input value
+        const docRef = await addDoc(collection(db, 'usuarios', user.uid, 'proyectos'), {
+          nombre: inputValue, // Agregar nuevo proyecto con el valor del input
         });
-        const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Query for user's projects
-        const querySnapshot = await getDocs(projectsQuery); // Fetch projects
-        const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Map projects data
-        setProyectos(proyectosData); // Set projects state
-        setInputValue(''); // Clear input value
+        const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
+        const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
+        const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
+        setProyectos(proyectosData); // Establecer estado de proyectos
+        setInputValue(''); // Limpiar valor del input
+        onSelectProject(docRef.id); // Redirigir a la página del proyecto recién creado
       }
     } catch (e) {
-      console.error('Ha ocurrido un error al intentar agregar el proyecto: ', e); // Log error
+      console.error('Ha ocurrido un error al intentar agregar el proyecto: ', e); // Registrar error
     }
-  }, [inputValue]);
+  }, [inputValue, onSelectProject]);
 
-  // Function to delete a project
+  // Función para eliminar un proyecto
   const handleDeleteProject = useCallback(async (id) => {
     try {
-      const user = auth.currentUser; // Get current user
+      const user = auth.currentUser; // Obtener usuario actual
       if (user) {
-        await deleteDoc(doc(db, 'usuarios', user.uid, 'proyectos', id)); // Delete project by id
-        const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Query for user's projects
-        const querySnapshot = await getDocs(projectsQuery); // Fetch projects
-        const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Map projects data
-        setProyectos(proyectosData); // Set projects state
+        await deleteDoc(doc(db, 'usuarios', user.uid, 'proyectos', id)); // Eliminar proyecto por id
+        const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
+        const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
+        const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
+        setProyectos(proyectosData); // Establecer estado de proyectos
       }
     } catch (e) {
-      console.error('Ha ocurrido un error al intentar eliminar el proyecto: ', e); // Log error
+      console.error('Ha ocurrido un error al intentar eliminar el proyecto: ', e); // Registrar error
     }
   }, []);
 
-  // Memoized calculation of aggregated activities
+  // Cálculo memorizado de actividades agregadas
   const actividadesAgregadas = useMemo(() => {
     const agregado = {};
     for (const projectId in actividades) {
       agregado[projectId] = actividades[projectId].reduce((acc, curr) => {
-        const llave = curr.actividad; // Activity key
+        const llave = curr.actividad; // Clave de actividad
         if (!acc[llave]) {
-          acc[llave] = 0; // Initialize if not present
+          acc[llave] = 0; // Inicializar si no está presente
         }
-        acc[llave] += curr.minutos; // Sum minutes
+        acc[llave] += curr.minutos; // Sumar minutos
         return acc;
       }, {});
     }
     return agregado;
   }, [actividades]);
 
-  // Memoized data for chart
+  // Datos memorizados para la gráfica
   const agregadoData = useMemo(() => {
     const data = {};
     for (const projectId in actividadesAgregadas) {
       data[projectId] = {
-        labels: Object.keys(actividadesAgregadas[projectId]), // Activity labels
+        labels: Object.keys(actividadesAgregadas[projectId]), // Etiquetas de actividades
         datasets: [
           {
-            label: 'Minutos por actividad', // Dataset label
-            data: Object.values(actividadesAgregadas[projectId]), // Activity data
-            backgroundColor: 'rgba(75, 192, 192, 0.6)', // Bar color
+            label: 'Minutos por actividad', // Etiqueta del dataset
+            data: Object.values(actividadesAgregadas[projectId]), // Datos de actividades
+            backgroundColor: 'rgba(75, 192, 192, 0.6)', // Color de las barras
           },
         ],
       };
@@ -121,12 +121,12 @@ const Proyectos = ({ onSelectProject }) => {
     return data;
   }, [actividadesAgregadas]);
 
-  // Render loader if data is still loading
+  // Renderizar loader si los datos aún se están cargando
   if (isLoading) {
     return <Loader />;
   }
 
-  // Render component
+  // Renderizar componente
   return (
     <div className='flex flex-col min-h-screen'>
       <NavBar />
@@ -135,11 +135,12 @@ const Proyectos = ({ onSelectProject }) => {
         <div className='w-full max-w-2xl mx-auto'>
           <ul className='p-10 w-full mt-4'>
             {proyectos.map((project) => (
-              <li key={project.id} className='flex justify-between items-center p-2 border-b'>
-                <span>{project.nombre}</span>
+              <li key={project.id} className='flex justify-between items-center border-b cursor-pointer hover:bg-gray-700  '>
+                <div onClick={() => onSelectProject(project.id)} className='p-2 w-full h-full'>
+                <span >{project.nombre}</span>
+                </div>
                 <div>
-                  <button className='cursor-pointer hover:scale-110 mx-2 sm:mx-4' onClick={() => onSelectProject(project.id)}>Seleccionar</button>
-                  <button className='cursor-pointer hover:scale-110 mx-2 sm:mx-4' onClick={() => handleDeleteProject(project.id)}>Eliminar</button>
+                  <button className='cursor-pointer hover:scale-110 mx-2 sm:mx-4' onClick={() => handleDeleteProject(project.id)}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="red"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg></button>
                 </div>
               </li>
             ))}
@@ -168,7 +169,7 @@ const Proyectos = ({ onSelectProject }) => {
   );
 };
 
-// PropTypes validation
+// Validación de PropTypes
 Proyectos.propTypes = {
   onSelectProject: PropTypes.func.isRequired,
 };

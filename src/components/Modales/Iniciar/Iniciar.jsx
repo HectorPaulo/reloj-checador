@@ -67,6 +67,8 @@ const IniciarModal = ({ isOpen, onRequestClose, inputValue, setInputValue, handl
         <option value="Lanzamiento">Lanzamiento</option>
         <option value="Revision">Revisión</option>
         <option value="RevisionCodigo">Revisión del código</option>
+        <option value="Diagramar">Diagramar</option>
+        <option value="Reunion">Reunión</option>
       </select>
       {error && <p className="text-red-500 mb-4">{error}</p>} {/* Muestra el mensaje de error si existe */}
       <button onClick={handleSubmit} className="px-6 py-2 bg-transparent border text-white cursor-pointer rounded hover:bg-white hover:text-black hover:scale-110">Iniciar</button> {/* Botón para iniciar */}
