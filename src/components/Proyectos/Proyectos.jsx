@@ -62,6 +62,7 @@ const Proyectos = ({ onSelectProject }) => {
       if (user) {
         const docRef = await addDoc(collection(db, 'usuarios', user.uid, 'proyectos'), {
           nombre: inputValue, // Agregar nuevo proyecto con el valor del input
+          fechaCreacion: new Date().toISOString() // Agregar la fecha de creación del proyecto
         });
         const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
         const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
@@ -117,12 +118,13 @@ const Proyectos = ({ onSelectProject }) => {
         // Título del PDF
         pdf.setFontSize(18);
         pdf.text(`Informe del Proyecto: ${projectName}`, 10, 10);
-
+        proyectoData.fechaCreacion = proyectoData.fechaCreacion ? new Date(proyectoData.fechaCreacion).toLocaleDateString() : 'Fecha no disponible';
+        proyectoData.fechaFinalizacion = new Date().toLocaleDateString();
         // Datos del proyecto en formato de tabla
         const proyectoTableData = [
           ['Nombre del Proyecto', proyectoData.nombre],
-          ['Descripción', proyectoData.descripcion],
-          ['Fecha de Creación', proyectoData.fechaCreacion],
+          ['Fecha de Inicio', proyectoData.fechaCreacion],
+          ['Fecha de Finalización', proyectoData.fechaFinalizacion],
           ['Total de Actividades', actividadesData.length],
         ];
 
@@ -301,7 +303,29 @@ const Proyectos = ({ onSelectProject }) => {
         {proyectos.map((project) => (
           <div key={project.id} className='w-full max-w-2xl mx-auto mt-8'>
             <h2 className="text-2xl font-bold text-center">Gráfica de Actividades - {project.nombre}</h2>
-            <Bar data={agregadoData[project.id]} />
+            <Bar 
+              data={{ 
+                ...agregadoData[project.id], 
+                datasets: [{ 
+                  ...agregadoData[project.id].datasets[0], 
+                  backgroundColor: '#F71735' 
+                }] 
+              }} 
+              options={{
+                plugins: {
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+                        const value = context.raw;
+                        const percentage = ((value / total) * 100).toFixed(2);
+                        return `${value} minutos (${percentage}%)`;
+                      }
+                    }
+                  }
+                }
+              }}
+            />
           </div>
         ))}
       </div>
