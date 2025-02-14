@@ -441,7 +441,11 @@ const handleCloseAlerta = useCallback(() => {
       <div className='w-full'>
         <NavBar /> {/* Barra de navegación */}
       </div>
+      <h1 className='font-bold text-2xl sm:text-4xl font-sans text-center my-6 sm:my-12'>Proyecto</h1>
       <h1 className='font-bold text-2xl sm:text-4xl font-sans text-center my-6 sm:my-12'>Tiempo de la actividad</h1>
+      {isRelojActivo && (
+        <p className='text-xl sm:text-2xl font-bold text-center'>Actividad: {actividad}</p>
+      )}
       <p className='text-2xl sm:text-4xl font-bold text-center'>{new Date(tiempo * 1000).toISOString().slice(11, 19)}</p>
       <div className='flex flex-row gap-4 sm:gap-8'>
         {!isRelojActivo ? (
