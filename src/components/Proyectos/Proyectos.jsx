@@ -53,28 +53,56 @@ const Proyectos = ({ onSelectProject }) => {
   }, []);
 
   // Función para agregar un nuevo proyecto
-  const handleAddProject = useCallback(async () => {
-    if (inputValue.trim() === '') {
-      return; // No hacer nada si el input está vacío
-    }
-    try {
-      const user = auth.currentUser; // Obtener usuario actual
-      if (user) {
-        const docRef = await addDoc(collection(db, 'usuarios', user.uid, 'proyectos'), {
-          nombre: inputValue, // Agregar nuevo proyecto con el valor del input
-          fechaCreacion: new Date().toISOString() // Agregar la fecha de creación del proyecto
+  // Función para agregar un nuevo proyecto
+const handleAddProject = useCallback(async () => {
+  if (inputValue.trim() === '') {
+    return; // No hacer nada si el input está vacío
+  }
+  try {
+    const user = auth.currentUser; // Obtener usuario actual
+    if (user) {
+      const docRef = await addDoc(collection(db, 'usuarios', user.uid, 'proyectos'), {
+        nombre: inputValue, // Agregar nuevo proyecto con el valor del input
+        fechaCreacion: new Date().toISOString() // Agregar la fecha de creación del proyecto
+      });
+
+      // Crear actividades con valores vacíos
+      const actividades = [
+        'Planificación',
+        'Análisis',
+        'Codificación',
+        'Pruebas',
+        'Lanzamiento',
+        'Revision',
+        'RevisionCodigo',
+        'Diagramar',
+        'Reunion'
+      ];
+
+      for (const actividad of actividades) {
+        await addDoc(collection(db, 'usuarios', user.uid, 'proyectos', docRef.id, 'actividades'), {
+          actividad,
+          minutos: 0,
+          fecha: '',
+          horaInicio: '',
+          horaFinal: '',
+          interrupcion: 0,
+          comentarios: ''
         });
-        const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
-        const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
-        const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
-        setProyectos(proyectosData); // Establecer estado de proyectos
-        setInputValue(''); // Limpiar valor del input
-        onSelectProject(docRef.id); // Redirigir a la página del proyecto recién creado
       }
-    } catch (e) {
-      console.error('Ha ocurrido un error al intentar agregar el proyecto: ', e); // Registrar error
+
+      const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
+      const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
+      const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
+      setProyectos(proyectosData); // Establecer estado de proyectos
+      setInputValue(''); // Limpiar valor del input
+      onSelectProject(docRef.id); // Redirigir a la página del proyecto recién creado
     }
-  }, [inputValue, onSelectProject]);
+  } catch (e) {
+    console.error('Ha ocurrido un error al intentar agregar el proyecto: ', e); // Registrar error
+  }
+}, [inputValue, onSelectProject]);
+
 
   // Función para eliminar un proyecto
   const handleDeleteProject = useCallback(async (id) => {
@@ -288,6 +316,9 @@ const Proyectos = ({ onSelectProject }) => {
               </li>
             ))}
           </ul>
+          <div className='flex justify-center'>
+          <img src="https://orig06.deviantart.net/0a7c/f/2008/256/6/b/esnupi_by_ttebizarro.jpg" alt="El esnupi" />
+          </div>
           <h4 className='font-semibold text-xl my-4'>Nuevo proyecto</h4>
           <input
             type="text"
