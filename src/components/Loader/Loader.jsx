@@ -8,7 +8,7 @@ const Loader = () => { // Define Loader functional component
       <div className="loader"> {/* Loader element */}
         <span></span> {/* Individual loader element */}
         <span></span> {/* Individual loader element */}
-        <span></span> {/* Individual loader element */}
+        <span></span>z {/* Individual loader element */}
       </div>
     </div>
   );

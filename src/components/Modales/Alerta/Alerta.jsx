@@ -7,7 +7,7 @@ const AlertaModal = ({ isOpen, onRequestClose }) => {
   // Efecto para reproducir el sonido de la alarma cuando la alerta se abre
   useEffect(() => {
     if (isOpen) {
-      const audio = new Audio('/public/papuSonido.mp3'); // Ruta al archivo de sonido de alarma
+      const audio = new Audio('/microondas.mp3'); // Ruta al archivo de sonido de alarma
       audio.play().catch((error) => {
         console.error('Error al reproducir el sonido de la alarma: ', error);
       });

@@ -316,9 +316,6 @@ const handleAddProject = useCallback(async () => {
               </li>
             ))}
           </ul>
-          <div className='flex justify-center'>
-          <img src="https://orig06.deviantart.net/0a7c/f/2008/256/6/b/esnupi_by_ttebizarro.jpg" alt="El esnupi" />
-          </div>
           <h4 className='font-semibold text-xl my-4'>Nuevo proyecto</h4>
           <input
             type="text"

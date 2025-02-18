@@ -8,12 +8,15 @@ const Contacto = () => { // Define un componente funcional llamado Contacto
             <div className="flex-grow container mx-auto p-6"> {/* Contenedor que crece para ocupar el espacio disponible, centrado y con padding */}
                 <h1 className="text-4xl font-bold text-center my-8">Contacto</h1> {/* Título principal con clases de Tailwind CSS para estilo */}
                 <p className="text-xl text-center mb-8">Puedes ponerte en contacto conmigo a través de los siguientes medios:</p> {/* Párrafo descriptivo con clases de Tailwind CSS para estilo */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> {/* Contenedor de grid con una columna en pantallas pequeñas y dos en medianas, con espacio entre elementos */}
+                <div className="grid grid-cols-3 md:grid-cols-3 gap-3"> {/* Contenedor de grid con una columna en pantallas pequeñas y dos en medianas, con espacio entre elementos */}
                     <div className="flex flex-col items-center"> {/* Contenedor flexible con alineación centrada */}
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#e8eaed"> {/* SVG de un ícono de correo */}
                             <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/> {/* Ruta del ícono */}
                         </svg>
                         <p className="text-lg mt-4">014417517@ulsaoaxaca.edu.mx</p> {/* Texto del correo electrónico con clases de Tailwind CSS para estilo */}
+                    </div>
+                    <div>
+                        <img src="/esnupi.png" alt="El esnupi"  />
                     </div>
                     <div className="flex flex-col items-center"> {/* Contenedor flexible con alineación centrada */}
                         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#e8eaed"> {/* SVG de un ícono de teléfono */}

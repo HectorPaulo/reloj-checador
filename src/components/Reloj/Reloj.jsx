@@ -420,7 +420,12 @@ const handleCloseAlerta = useCallback(() => {
       </div>
       <h1 className='font-bold text-2xl sm:text-4xl font-sans text-center my-6 sm:my-12'>Tiempo de la actividad</h1>
       {isRelojActivo && (
+<div className='flex flex-col items-center'>
+<video width={320} height={240} autoPlay loop className='rounded-lg'>
+        <source src="/samuLoader.mp4" type="video/mp4"/>
+      </video>
         <p className='text-xl sm:text-2xl font-bold text-center'>Actividad: {actividad}</p>
+</div>
       )}
       <p className='text-2xl sm:text-4xl font-bold text-center'>{new Date(tiempo * 1000).toISOString().slice(11, 19)}</p>
       <div className='flex flex-row gap-4 sm:gap-8'>
