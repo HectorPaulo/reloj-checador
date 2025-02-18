@@ -321,11 +321,17 @@ const handleAddProject = useCallback(async () => {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="w-full p-3 mb-4 border border-gray-300 rounded-lg bg-white text-black"
+            className="w-full p-3 mb-4 border border-gray-300 rounded-lg disabled:bg-white disabled:text-black bg-transparent text-white"
             placeholder="Nombre del proyecto"
           />
           <div className="flex justify-center">
-            <button onClick={handleAddProject} className="w-50 px-6 py-3 my-4 bg-transparent border text-white cursor-pointer rounded hover:bg-white hover:text-black hover:scale-110">Agregar</button>
+            <button 
+              onClick={handleAddProject} 
+              className="w-50 px-6 py-3 my-4 bg-transparent border text-white cursor-pointer rounded hover:bg-white hover:text-black hover:scale-110 disabled:text-black disabled:bg-gray-700" 
+              disabled={!inputValue.trim()}
+            >
+              Agregar
+            </button>
           </div>
         </div>
         {proyectos.map((project) => (
