@@ -13,6 +13,7 @@ import IniciarModal from '../Modales/Iniciar/Iniciar';
 import FinalizarModal from '../Modales/Finalizar/Finalizar';
 import DetallesModal from '../Modales/Detalles/DetallesModal';
 import ComentariosModal from '../Modales/Comentarios/Comentarios';
+import ErrorModal from '../Modales/Error/Error';
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import Loader from '../Loader/Loader';
@@ -29,6 +30,8 @@ const Reloj = () => {
   const [finalizarModalIsOpen, setFinalizarModalIsOpen] = useState(false);
   const [detallesModalIsOpen, setDetallesModalIsOpen] = useState(false);
   const [comentariosModalIsOpen, setComentariosModalIsOpen] = useState(false);
+  const [isErrorEncontrado, setIsErrorEncontrado] = useState(false);
+  const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
   const [alertaModalIsOpen, setAlertaModalIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [minutos, setMinutos] = useState(0);
@@ -139,6 +142,18 @@ useEffect(() => {
     }
   }, [tiempo, alertaModalIsOpen, actividad, comentarios, projectId, startTime, totalPauseTime]);
 
+  // Función para manejar la pausa o reanudación del reloj
+  const handleError = useCallback(() => {
+      setIsPaused(false); // Reanuda el reloj
+      setIsRelojActivo(true);
+      setIsErrorEncontrado(false);
+      setErrorModalIsOpen(true);
+      const now = new Date();
+      const pauseDuration = (now - pauseTime) / 1000; // Calcula la duración de la pausa en segundos
+      setTotalPauseTime((prevTotalPauseTime) => prevTotalPauseTime + pauseDuration);
+ 
+  }, [pauseTime]);
+  
   // Función para cerrar la alerta y detener el contador
 const handleCloseAlerta = useCallback(() => {
   
@@ -165,6 +180,7 @@ const handleCloseAlerta = useCallback(() => {
     setIsRelojActivo(false); // Detiene el reloj
     setComentariosModalIsOpen(true); // Abre el modal de comentarios
   }, []);
+
 
   // Función para manejar el envío de comentarios
   const handleComentariosSubmit = useCallback(
@@ -438,18 +454,27 @@ const handleCloseAlerta = useCallback(() => {
           </button>
         ) : (
           <>
+          <div className='grid grid-cols-3 items-center gap-4 sm:gap-8'>
             <button
               className='font-bold rounded bg-transparent w-32 sm:w-40 border-2 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-black hover:scale-125'
               onClick={handleStop}
-            >
+              >
               Parar
             </button>
             <button
               className='font-bold rounded bg-transparent w-32 sm:w-40 border-2 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-black hover:scale-125'
               onClick={handlePauseResume}
-            >
+              >
               {isPaused ? 'Reanudar' : 'Pausar'}
             </button>
+            <button
+              className='font-bold rounded w-32 sm:w-40 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-red-800 bg-red-500 hover:text-black hover:scale-125'
+              onClick={handleError}
+              >
+              ¡Error!
+            </button>
+
+              </div>
           </>
         )}
       </div>
@@ -529,6 +554,11 @@ const handleCloseAlerta = useCallback(() => {
       <AlertaModal
         isOpen={alertaModalIsOpen}
         onRequestClose={handleCloseAlerta}
+      />
+      <ErrorModal 
+      isOpen={errorModalIsOpen}
+      onRequestClose={() => setErrorModalIsOpen(false)}
+      error={isErrorEncontrado}
       />
       <Footer />
     </div>

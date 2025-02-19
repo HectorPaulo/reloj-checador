@@ -12,6 +12,7 @@ import 'chart.js/auto';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
+import ButtonLoader from '../ButtonLoader/ButtonLoader';
 
 // Definición del componente
 const Proyectos = ({ onSelectProject }) => {
@@ -326,7 +327,11 @@ const handleAddProject = useCallback(async () => {
           />
           <div className="flex justify-center">
             <button 
-              onClick={handleAddProject} 
+              onClick={async () => {
+                setIsLoading(true);
+                await handleAddProject();
+                setIsLoading(false);
+              }} 
               className="w-50 px-6 py-3 my-4 bg-transparent border text-white cursor-pointer rounded hover:bg-white hover:text-black hover:scale-110 disabled:text-black disabled:bg-gray-700" 
               disabled={!inputValue.trim()}
             >
