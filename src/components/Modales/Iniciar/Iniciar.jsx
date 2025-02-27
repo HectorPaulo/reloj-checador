@@ -49,15 +49,15 @@ const IniciarModal = ({ isOpen, onRequestClose, inputValue, setInputValue, handl
       isOpen={isOpen} // Propiedad para abrir o cerrar el modal
       onRequestClose={onRequestClose} // Función para cerrar el modal
       contentLabel="Nombre de la Actividad" // Etiqueta de contenido para accesibilidad
-      className="flex flex-col items-center justify-center bg-gray-700 p-12 rounded-lg" // Clases de estilo para el modal
-      overlayClassName="fixed inset-0 bg-opacity-50 flex items-center justify-center backdrop-blur-sm" // Clases de estilo para el overlay
+      className="flex flex-col items-center justify-center border-2 p-12 rounded-xl" // Clases de estilo para el modal
+      overlayClassName="fixed inset-0 flex items-center justify-center backdrop-blur-lg" // Clases de estilo para el overlay
     >
-      <h2 className="text-white text-xl font-semibold mb-4">Ingrese el nombre de la actividad</h2> {/* Título del modal */}
+      <h2 className="text-white text-4xl font-semibold my-8">Ingrese el nombre de la actividad</h2> {/* Título del modal */}
       <select
         ref={inputRef} // Referencia del input
         value={inputValue} // Valor del input
         onChange={(e) => setInputValue(e.target.value)} // Maneja el cambio del input
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg bg-white text-black" // Clases de estilo para el input
+        className="w- p-4 mb-4 border rounded-xl bg-gray-500 /text-gray-100 font-semibold text-lg text-center" // Clases de estilo para el input
       >
         <option value="">Seleccione una opción</option>
         <option value="Planificación">Planificación</option>
@@ -71,7 +71,7 @@ const IniciarModal = ({ isOpen, onRequestClose, inputValue, setInputValue, handl
         <option value="Reunion">Reunión</option>
       </select>
       {error && <p className="text-red-500 mb-4">{error}</p>} {/* Muestra el mensaje de error si existe */}
-      <button onClick={handleSubmit} className="px-6 py-2 bg-transparent border text-white cursor-pointer rounded hover:bg-white hover:text-black hover:scale-110">Iniciar</button> {/* Botón para iniciar */}
+      <button onClick={handleSubmit} className="px-6 py-4 bg-transparent border-2 text-white font-semibold cursor-pointer rounded-xl hover:bg-gradient-to-r hover:from-green-500 hover:via-green-700 hover:to-green-800 hover:animate-pulse hover:text-white hover:scale-110 hover:border-0">Iniciar</button> {/* Botón para iniciar */}
     </Modal>
   );
 };

@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { db, auth } from '../../firebaseConfig';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, getDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc, query, getDoc, updateDoc } from 'firebase/firestore';
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import Loader from '../Loader/Loader';
@@ -12,7 +11,8 @@ import 'chart.js/auto';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
-import ButtonLoader from '../ButtonLoader/ButtonLoader';
+import DetallesProyecto from '../Modales/DetallesProyecto/DetallesProyecto';
+import ErrorModal from '../Modales/Error/Error';
 
 // Definición del componente
 const Proyectos = ({ onSelectProject }) => {
@@ -21,6 +21,10 @@ const Proyectos = ({ onSelectProject }) => {
   const [actividades, setActividades] = useState({}); // Almacena actividades para cada proyecto
   const [isLoading, setIsLoading] = useState(true); // Estado de carga
   const [inputValue, setInputValue] = useState(''); // Valor del input para nuevo proyecto
+  const [selectedProject, setSelectedProject] = useState(null); // Estado para el proyecto seleccionado
+  const [detallesProyectoModalIsOpen, setDetallesProyectoModalIsOpen] = useState(false); // Estado para el modal de detalles del proyecto
+  const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
+  const [selectedDefecto, setSelectedDefecto] = useState(null);
 
   // Obtener proyectos y actividades al montar el componente
   useEffect(() => {
@@ -54,56 +58,59 @@ const Proyectos = ({ onSelectProject }) => {
   }, []);
 
   // Función para agregar un nuevo proyecto
-  // Función para agregar un nuevo proyecto
-const handleAddProject = useCallback(async () => {
-  if (inputValue.trim() === '') {
-    return; // No hacer nada si el input está vacío
-  }
-  try {
-    const user = auth.currentUser; // Obtener usuario actual
-    if (user) {
-      const docRef = await addDoc(collection(db, 'usuarios', user.uid, 'proyectos'), {
-        nombre: inputValue, // Agregar nuevo proyecto con el valor del input
-        fechaCreacion: new Date().toISOString() // Agregar la fecha de creación del proyecto
-      });
-
-      // Crear actividades con valores vacíos
-      const actividades = [
-        'Planificación',
-        'Análisis',
-        'Codificación',
-        'Pruebas',
-        'Lanzamiento',
-        'Revision',
-        'RevisionCodigo',
-        'Diagramar',
-        'Reunion'
-      ];
-
-      for (const actividad of actividades) {
-        await addDoc(collection(db, 'usuarios', user.uid, 'proyectos', docRef.id, 'actividades'), {
-          actividad,
-          minutos: 0,
-          fecha: '',
-          horaInicio: '',
-          horaFinal: '',
-          interrupcion: 0,
-          comentarios: ''
-        });
-      }
-
-      const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
-      const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
-      const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
-      setProyectos(proyectosData); // Establecer estado de proyectos
-      setInputValue(''); // Limpiar valor del input
-      onSelectProject(docRef.id); // Redirigir a la página del proyecto recién creado
+  const handleAddProject = useCallback(async () => {
+    if (inputValue.trim() === '') {
+      return; // No hacer nada si el input está vacío
     }
-  } catch (e) {
-    console.error('Ha ocurrido un error al intentar agregar el proyecto: ', e); // Registrar error
-  }
-}, [inputValue, onSelectProject]);
+    try {
+      const user = auth.currentUser; // Obtener usuario actual
+      if (user) {
+        const docRef = await addDoc(collection(db, 'usuarios', user.uid, 'proyectos'), {
+          nombre: inputValue, // Agregar nuevo proyecto con el valor del input
+          fechaCreacion: new Date().toISOString() // Agregar la fecha de creación del proyecto
+        });
 
+        // Crear actividades con valores vacíos
+        const actividades = [
+          'Planificación',
+          'Análisis',
+          'Codificación',
+          'Pruebas',
+          'Lanzamiento',
+          'Revision',
+          'RevisionCodigo',
+          'Diagramar',
+          'Reunion'
+        ];
+
+        for (const actividad of actividades) {
+          await addDoc(collection(db, 'usuarios', user.uid, 'proyectos', docRef.id, 'actividades'), {
+            actividad,
+            minutos: 0,
+            fecha: '',
+            horaInicio: '',
+            horaFinal: '',
+            interrupcion: 0,
+            comentarios: ''
+          });
+        }
+
+        const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
+        const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
+        const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
+        setProyectos(proyectosData); // Establecer estado de proyectos
+        setInputValue(''); // Limpiar valor del input
+        onSelectProject(docRef.id); // Redirigir a la página del proyecto recién creado
+      }
+    } catch (e) {
+      console.error('Ha ocurrido un error al intentar agregar el proyecto: ', e); // Registrar error
+    }
+  }, [inputValue, onSelectProject]);
+
+  const handleDetailsProyecto = useCallback((project) => {
+    setSelectedProject(project);
+    setDetallesProyectoModalIsOpen(true);
+  }, []);
 
   // Función para eliminar un proyecto
   const handleDeleteProject = useCallback(async (id) => {
@@ -244,6 +251,42 @@ const handleAddProject = useCallback(async () => {
     }
   }, []);
 
+  const handleAddError = useCallback(async (errorData) => {
+    try {
+      const user = auth.currentUser;
+      if (user && selectedProject) {
+        const proyectoRef = doc(db, 'usuarios', user.uid, 'proyectos', selectedProject.id);
+        const proyectoSnapshot = await getDoc(proyectoRef);
+        const proyectoData = proyectoSnapshot.data();
+
+        const defectos = proyectoData.defector || [];
+        defectos.push(errorData);
+
+        await updateDoc(proyectoRef, { defector: defectos });
+
+        const updatedProject = { ...selectedProject, defector: defectos };
+        setSelectedProject(updatedProject);
+
+        const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos');
+        const querySnapshot = await getDocs(projectsQuery);
+        const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProyectos(proyectosData);
+      }
+    } catch (error) {
+      console.error('Error al agregar el defecto: ', error);
+    }
+  }, [selectedProject]);
+
+  const handleEditError = (defecto) => {
+    setSelectedDefecto(defecto);
+    setErrorModalIsOpen(true);
+  };
+
+  const handleSaveError = (formData) => {
+    handleAddError(formData);
+    setSelectedDefecto(null);
+  };
+
   // Cálculo memorizado de actividades agregadas
   const actividadesAgregadas = useMemo(() => {
     const agregado = {};
@@ -297,6 +340,12 @@ const handleAddProject = useCallback(async () => {
                   <span>{project.nombre}</span>
                 </div>
                 <div className='flex items-center'>
+                  <button
+                    className='cursor-pointer hover:scale-110 mx-2 sm:mx-4'
+                    onClick={() => handleDetailsProyecto(project)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="white"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                  </button>
                   <button
                     className='cursor-pointer hover:scale-110 mx-2 sm:mx-4'
                     onClick={() => handleDownloadPDF(project.id, project.nombre)}
@@ -368,6 +417,18 @@ const handleAddProject = useCallback(async () => {
           </div>
         ))}
       </div>
+            <DetallesProyecto 
+            isOpen={detallesProyectoModalIsOpen}
+            onRequestClose={() => setDetallesProyectoModalIsOpen(false)}
+            proyecto={selectedProject}
+            onEditError={handleEditError}
+            />
+      <ErrorModal
+        isOpen={errorModalIsOpen}
+        onRequestClose={() => setErrorModalIsOpen(false)}
+        onSubmit={handleSaveError}
+        defecto={selectedDefecto}
+      />
       <Footer />
     </div>
   );

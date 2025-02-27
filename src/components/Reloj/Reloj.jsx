@@ -41,6 +41,16 @@ const Reloj = () => {
   const [pauseTime, setPauseTime] = useState(null);
   const [totalPauseTime, setTotalPauseTime] = useState(0);
   const [comentarios, setComentarios] = useState('');
+  const [selectedDefecto, setSelectedDefecto] = useState(null);
+  const [defectos, setDefectos] = useState([]);
+  const [fechaError, setfechaError] = useState('');
+  const [tipoError, setTipoError] = useState('');
+  const [encontrado, setEncontrado] = useState('');
+  const [removido, setRemovido] = useState('');
+  const [arreglado, setArreglado] = useState('');
+  const [descripcionError, setDescripcionError] = useState('');
+  const [tiempoCompostura, setTiempoCompostura] = useState('');
+  
 
   // Efecto para manejar el cronómetro
   useEffect(() => {
@@ -143,17 +153,30 @@ useEffect(() => {
   }, [tiempo, alertaModalIsOpen, actividad, comentarios, projectId, startTime, totalPauseTime]);
 
   // Función para manejar la pausa o reanudación del reloj
-  const handleError = useCallback(() => {
-      setIsPaused(false); // Reanuda el reloj
-      setIsRelojActivo(true);
-      setIsErrorEncontrado(false);
-      setErrorModalIsOpen(true);
-      const now = new Date();
-      const pauseDuration = (now - pauseTime) / 1000; // Calcula la duración de la pausa en segundos
-      setTotalPauseTime((prevTotalPauseTime) => prevTotalPauseTime + pauseDuration);
- 
-  }, [pauseTime]);
-  
+  const handleError = useCallback(
+    async (formData) => {
+      try {
+        const user = auth.currentUser;
+        if (user && projectId) {
+          const defectoData = {
+            ...formData,
+            tiempoCompostura: new Date().toISOString()
+          };
+          await addDoc(collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'defectos'), defectoData);
+          const defectosQuery = query(collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'defectos'));
+          const querySnapshot = await getDocs(defectosQuery);
+          const defectosData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          setDefectos(defectosData);
+          setSelectedDefecto(defectosData);
+          setErrorModalIsOpen(true);
+        }
+      } catch (e) {
+        console.error('Ha ocurrido un error al intentar agregar el documento: ', e);
+      }
+    },
+    [projectId]
+  );
+
   // Función para cerrar la alerta y detener el contador
 const handleCloseAlerta = useCallback(() => {
   
@@ -432,7 +455,7 @@ const handleCloseAlerta = useCallback(() => {
   return (
     <div className='flex flex-col items-center'>
       <div className='w-full'>
-        <NavBar /> {/* Barra de navegación */}
+        <NavBar /> 
       </div>
       <h1 className='font-bold text-2xl sm:text-4xl font-sans text-center my-6 sm:my-12'>Tiempo de la actividad</h1>
       {isRelojActivo && (
@@ -469,7 +492,7 @@ const handleCloseAlerta = useCallback(() => {
             </button>
             <button
               className='font-bold rounded w-32 sm:w-40 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-red-800 bg-red-500 hover:text-black hover:scale-125'
-              onClick={handleError}
+              onClick={() => setErrorModalIsOpen(true)}
               >
               ¡Error!
             </button>
@@ -558,7 +581,9 @@ const handleCloseAlerta = useCallback(() => {
       <ErrorModal 
       isOpen={errorModalIsOpen}
       onRequestClose={() => setErrorModalIsOpen(false)}
-      error={isErrorEncontrado}
+      onSubmit={handleError}
+      defecto={selectedDefecto}
+      selectedProject={{ id: projectId }}
       />
       <Footer />
     </div>
