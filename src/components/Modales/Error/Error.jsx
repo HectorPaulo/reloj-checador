@@ -30,7 +30,7 @@ const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto, selectedProject
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData); // Enviar los datos del formulario
+    onSubmit(formData);
 
     try {
       const user = auth.currentUser;
@@ -113,8 +113,8 @@ const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto, selectedProject
             <textarea className="rounded-xl border-2 p-4 max-w-full" name="descripcionError" id="descripcionError" cols="30" rows="4" value={formData.descripcionError} onChange={handleChange}></textarea>
           </div>
           <div className='flex space-x-4'>
-            <button onClick={onRequestClose} type="submit" className="bg-gradient-to-l from-red-500 via-red-700 to-red-900 font-semibold text-lg text-white px-8 py-4 rounded-xl cursor-pointer hover:scale-110 w-full">Cerrar</button>
-            <button onClick={onRequestClose} type="submit" className="bg-gradient-to-r from-blue-500 via-blue-700 to-blue-900 font-semibold text-lg text-white px-8 py-4 rounded-xl cursor-pointer hover:scale-110 w-full">Aceptar</button>
+            <button onClick={onRequestClose} type="button" className="bg-gradient-to-l from-red-500 via-red-700 to-red-900 font-semibold text-lg text-white px-8 py-4 rounded-xl cursor-pointer hover:scale-110 w-full">Cerrar</button>
+            <button type="submit" className="bg-gradient-to-r from-blue-500 via-blue-700 to-blue-900 font-semibold text-lg text-white px-8 py-4 rounded-xl cursor-pointer hover:scale-110 w-full">Aceptar</button>
           </div>
         </form>
       </div>

@@ -100,7 +100,7 @@ useEffect(() => {
 
   // Efecto para mostrar la alerta cuando el contador llegue a 60 segundos
   useEffect(() => {
-    if (tiempo >= 61 && !alertaModalIsOpen) {
+    if (tiempo >= 3600 && !alertaModalIsOpen) {
       setAlertaModalIsOpen(true);
       setIsRelojActivo(false); // Detiene el reloj
 
