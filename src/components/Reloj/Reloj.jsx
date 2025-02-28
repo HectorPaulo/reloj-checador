@@ -30,7 +30,6 @@ const Reloj = () => {
   const [finalizarModalIsOpen, setFinalizarModalIsOpen] = useState(false);
   const [detallesModalIsOpen, setDetallesModalIsOpen] = useState(false);
   const [comentariosModalIsOpen, setComentariosModalIsOpen] = useState(false);
-  const [isErrorEncontrado, setIsErrorEncontrado] = useState(false);
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
   const [alertaModalIsOpen, setAlertaModalIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -42,15 +41,7 @@ const Reloj = () => {
   const [totalPauseTime, setTotalPauseTime] = useState(0);
   const [comentarios, setComentarios] = useState('');
   const [selectedDefecto, setSelectedDefecto] = useState(null);
-  const [defectos, setDefectos] = useState([]);
-  const [fechaError, setfechaError] = useState('');
-  const [tipoError, setTipoError] = useState('');
-  const [encontrado, setEncontrado] = useState('');
-  const [removido, setRemovido] = useState('');
-  const [arreglado, setArreglado] = useState('');
-  const [descripcionError, setDescripcionError] = useState('');
-  const [tiempoCompostura, setTiempoCompostura] = useState('');
-  
+  const [defectos, setDefectos] = useState([]);  
 
   // Efecto para manejar el cronómetro
   useEffect(() => {
@@ -460,7 +451,7 @@ const handleCloseAlerta = useCallback(() => {
       <h1 className='font-bold text-2xl sm:text-4xl font-sans text-center my-6 sm:my-12'>Tiempo de la actividad</h1>
       {isRelojActivo && (
 <div className='flex flex-col items-center'>
-<video width={320} height={240} autoPlay loop className='rounded-lg'>
+<video width={320} height={240} autoPlay muted loop className='rounded-lg'>
         <source src="/samuLoader.mp4" type="video/mp4"/>
       </video>
         <p className='text-xl sm:text-2xl font-bold text-center'>Actividad: {actividad}</p>
