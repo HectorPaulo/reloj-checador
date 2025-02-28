@@ -30,7 +30,7 @@ const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto, selectedProject
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit(formData); // Enviar los datos del formulario
 
     try {
       const user = auth.currentUser;
