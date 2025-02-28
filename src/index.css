@@ -1,6 +1,11 @@
 /* Importar los recursos de Tailwind CSS */
 @import "tailwindcss";
 
+/* src/index.css */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
 /* Definir la animación slide-in-out */
 @keyframes slide-in-out {
   0% {
