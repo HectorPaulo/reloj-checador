@@ -31,7 +31,7 @@ const ComentariosModal = ({ isOpen, onRequestClose, onSubmit }) => {
       // Applying custom class names for styling the modal overlay
       overlayClassName="fixed inset-0 flex items-center backdrop-blur-lg justify-center"
     >
-      <div className="bg-gradient-to-b from-green-500 via-green to-green-900 border-2 p-6 rounded-2xl  max-w-full">
+      <div className="bg-gradient-to-b from-gray-500 to-gray-900 border-2 p-6 rounded-2xl  max-w-full">
         {/* Modal title */}
         <h2 className="font-bold text-white text-4xl mb-4">Comentarios</h2>
         {/* Textarea for user to input comments */}
@@ -45,7 +45,7 @@ const ComentariosModal = ({ isOpen, onRequestClose, onSubmit }) => {
         />
         {/* Button to submit the comments */}
         <button
-          className="mt-4 rounded border bg-transparent cursor-pointer font-semibold text-white hover:scale-110 hover:text-black hover:bg-white px-4 py-2"
+          className="mt-4 mx-auto rounded border bg-transparent cursor-pointer font-semibold text-white hover:scale-110 hover:text-black hover:bg-white px-4 py-2"
           // Calling handleSubmit function when the button is clicked
           onClick={handleSubmit}
         >

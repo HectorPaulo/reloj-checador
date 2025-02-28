@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { db, auth } from '../../firebaseConfig';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, query, getDoc, updateDoc } from 'firebase/firestore';
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import Loader from '../Loader/Loader';
@@ -13,6 +14,7 @@ import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 import DetallesProyecto from '../Modales/DetallesProyecto/DetallesProyecto';
 import ErrorModal from '../Modales/Error/Error';
+import ConfirmarBorrar from '../Modales/Borrar/BorrarModal';
 
 // Definición del componente
 const Proyectos = ({ onSelectProject }) => {
@@ -25,15 +27,17 @@ const Proyectos = ({ onSelectProject }) => {
   const [detallesProyectoModalIsOpen, setDetallesProyectoModalIsOpen] = useState(false); // Estado para el modal de detalles del proyecto
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
   const [selectedDefecto, setSelectedDefecto] = useState(null);
-
+  const [borrarId, setBorrarId] = useState(null);
+  const [borrarModalIsOpen, setBorrarModalIsOpen] = useState(false);
+  
   // Obtener proyectos y actividades al montar el componente
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const user = auth.currentUser; // Obtener usuario actual
         if (user) {
-          const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
-          const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
+          const consultaProyectos = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
+          const querySnapshot = await getDocs(consultaProyectos); // Obtener proyectos
           const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
           setProyectos(proyectosData); // Establecer estado de proyectos
 
@@ -113,16 +117,11 @@ const Proyectos = ({ onSelectProject }) => {
   }, []);
 
   // Función para eliminar un proyecto
+
   const handleDeleteProject = useCallback(async (id) => {
-    try {
-      const user = auth.currentUser; // Obtener usuario actual
-      if (user) {
-        await deleteDoc(doc(db, 'usuarios', user.uid, 'proyectos', id)); // Eliminar proyecto por id
-        const projectsQuery = collection(db, 'usuarios', user.uid, 'proyectos'); // Consulta para los proyectos del usuario
-        const querySnapshot = await getDocs(projectsQuery); // Obtener proyectos
-        const proyectosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Mapear datos de proyectos
-        setProyectos(proyectosData); // Establecer estado de proyectos
-      }
+    try{
+      setBorrarId(id);
+      setBorrarModalIsOpen(true);
     } catch (e) {
       console.error('Ha ocurrido un error al intentar eliminar el proyecto: ', e); // Registrar error
     }
@@ -423,6 +422,11 @@ const Proyectos = ({ onSelectProject }) => {
             proyecto={selectedProject}
             onEditError={handleEditError}
             />
+      <ConfirmarBorrar
+        id={borrarId}
+        setBorrarModal={setBorrarModalIsOpen}
+        setBorrarId={setBorrarId}
+      />
       <ErrorModal
         isOpen={errorModalIsOpen}
         onRequestClose={() => setErrorModalIsOpen(false)}

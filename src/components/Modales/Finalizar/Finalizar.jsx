@@ -42,13 +42,15 @@ const FinalizarModal = ({ isOpen, onRequestClose, actividad, minutos }) => {
       isOpen={isOpen} // Controla si el modal está abierto o cerrado
       onRequestClose={onRequestClose} // Función para cerrar el modal
       contentLabel="Actividad Finalizada" // Etiqueta de accesibilidad para el modal
-      className="flex flex-col items-center justify-center bg-gray-700 p-12 rounded-lg" // Clases de estilo para el modal
-      overlayClassName="fixed inset-0 bg-opacity-50 flex items-center justify-center backdrop-blur-sm" // Clases de estilo para el overlay del modal
+      className="flex flex-col items-center justify-center bg-gradient-to-b from-gray-500 to-gray-900 p-6 rounded-xl w-1/2 h-1/3" // Clases de estilo para el modal
+      overlayClassName="fixed inset-0 bg-opacity-50 flex items-center justify-center backdrop-blur-xl" // Clases de estilo para el overlay del modal
     >
-      <h2 className="text-white text-xl font-semibold mb-4">Actividad Finalizada</h2> {/* Título del modal */}
-      <p className="text-white mb-4">Actividad: {actividad}</p> {/* Muestra la actividad */}
-      <p className="text-white mb-4">Duración: {minutos} minutos</p> {/* Muestra la duración en minutos */}
-      <button onClick={onRequestClose} className="px-6 py-2 bg-transparent border text-white cursor-pointer rounded hover:bg-white hover:text-black hover:scale-110">Cerrar</button> {/* Botón para cerrar el modal */}
+      <h2 className="text-white text-4xl font-bold my-auto">Actividad Finalizada</h2> {/* Título del modal */}
+      <div className='flex flex-row items-center justify-center my-auto gap-3'> {/* Contenedor de la actividad y la duración */}
+      <p className="text-white mb-4 text-xl font-semibold">Duración:</p> {/* Muestra la duración en minutos */}
+      <p className="text-white mb-4 text-lg font-semibold">{minutos} minutos</p> {/* Muestra la duración en minutos */}
+      </div>
+      <button onClick={onRequestClose} className="px-15 py-3 my-auto bg-transparent bg-gradient-to-r from-blue-700 to-blue-800 text-white cursor-pointer rounded hover:bg-gradient-to-r hover:from-blue-900 hover:to-blue-950 hover:border-0 hover:animate-pulse font-semibold hover:scale-110">Cerrar</button> {/* Botón para cerrar el modal */}
     </Modal>
   );
 };

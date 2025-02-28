@@ -49,7 +49,7 @@ const IniciarModal = ({ isOpen, onRequestClose, inputValue, setInputValue, handl
       isOpen={isOpen} // Propiedad para abrir o cerrar el modal
       onRequestClose={onRequestClose} // Función para cerrar el modal
       contentLabel="Nombre de la Actividad" // Etiqueta de contenido para accesibilidad
-      className="flex flex-col items-center justify-center border-2 p-12 rounded-4xl bg-gradient-to-b from-blue-800 via-blue-900 to-blue-950 border-blue-950" // Clases de estilo para el modal
+      className="flex flex-col items-center justify-center border-2 p-12 rounded-4xl bg-gradient-to-b from-gray-800 via-gray-900 to-gray-950 border-blue-950" // Clases de estilo para el modal
       overlayClassName="fixed inset-0 flex items-center justify-center backdrop-blur-lg" // Clases de estilo para el overlay
     >
       <h2 className="text-white text-4xl font-semibold my-8">Ingrese el nombre de la actividad</h2> {/* Título del modal */}

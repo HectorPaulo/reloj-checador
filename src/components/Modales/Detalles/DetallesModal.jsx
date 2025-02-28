@@ -9,13 +9,13 @@ const DetallesModal = ({ isOpen, onRequestClose, actividad }) => {
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Detalles de la Actividad"
-      className="flex w-100 items-center justify-center"
+      className="rounded-2xl p-6 bg-gradient-to-b from-gray-500 to-gray-900 flex max-w-full w-1/3 text-xl items-center justify-center"
       overlayClassName="fixed inset-0 backdrop-blur-md flex items-center justify-center"
     >
-      <div className="border-2 p-6 rounded-4xl max-w-md w-full">
+      <div className="flex flex-col items-center">
         {actividad ? (
           <>
-            <h2 className="font-bold text-white text-3xl mb-4">Detalles de la Actividad</h2>
+            <h2 className="font-bold text-white text-4xl mb-4">Detalles de la Actividad</h2>
             <table className="min-w-full">
               <thead>
                 <tr>
@@ -38,7 +38,7 @@ const DetallesModal = ({ isOpen, onRequestClose, actividad }) => {
                 </tr>
                 <tr>
                   <td className="py-2 px-4 text-white"><strong>Interrupción:</strong></td>
-                  <td className="py-2 px-4 text-white">{actividad.interrupcion} segundos</td>
+                  <td className="py-2 px-4 text-white">{Math.round(actividad.interrupcion)} segundos</td>
                 </tr>
                 <tr>
                   <td className="py-2 px-4 text-white"><strong>Tiempo:</strong></td>
@@ -67,7 +67,7 @@ const DetallesModal = ({ isOpen, onRequestClose, actividad }) => {
           <p className="font-bold text-lg my-4">No hay detalles disponibles.</p>
         )}
         <button
-          className="mt-4 rounded border bg-transparent cursor-pointer font-semibold text-white hover:scale-110 hover:text-black hover:bg-white px-4 py-2"
+          className="my-auto mt-4 rounded-xl bg-gradient-to-r from-blue-900 to-blue-950 cursor-pointer font-semibold text-white hover:scale-110 hover:animate-pulse hover:bg-white px-12 py-3"
           onClick={onRequestClose}
         >
           Cerrar

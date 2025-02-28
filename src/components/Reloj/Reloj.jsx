@@ -4,8 +4,10 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Chart } from 'chart.js';
 import 'jspdf-autotable';
+import { useParams } from 'react-router-dom';
+import { addDefecto, getDefectos, addActividad, getActividades, deleteActividad } from '../../controllers/controller';
 import { db, auth } from '../../firebaseConfig';
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, getDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import AlertaModal from '../Modales/Alerta/Alerta';
 import { Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
@@ -17,7 +19,6 @@ import ErrorModal from '../Modales/Error/Error';
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import Loader from '../Loader/Loader';
-import { useParams } from 'react-router-dom';
 
 const Reloj = () => {
   const { projectId } = useParams();
@@ -41,7 +42,7 @@ const Reloj = () => {
   const [totalPauseTime, setTotalPauseTime] = useState(0);
   const [comentarios, setComentarios] = useState('');
   const [selectedDefecto, setSelectedDefecto] = useState(null);
-  const [defectos, setDefectos] = useState([]);  
+  const [defectos, setDefectos] = useState([]);
 
   // Efecto para manejar el cronómetro
   useEffect(() => {
@@ -58,36 +59,29 @@ const Reloj = () => {
 
   // Efecto para cargar las actividades desde Firestore
   useEffect(() => {
-    const fetchactividades = async () => {
+    const fetchActividades = async () => {
       try {
-        const user = auth.currentUser;
-        if (user) {
-          const actividadesQuery = query(
-            collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
-          );
-          const querySnapshot = await getDocs(actividadesQuery);
-          const actividadesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          setActividades(actividadesData);
-        }
+        const actividadesData = await getActividades(projectId);
+        setActividades(actividadesData);
       } catch (error) {
         console.error('Error al buscar las actividades: ', error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchactividades();
+    fetchActividades();
   }, [projectId]);
 
-// Efecto para manejar el contador de pausa
-useEffect(() => {
-  let interval;
-  if (isPaused) {
-    interval = setInterval(() => {
-      setTotalPauseTime((prevTotalPauseTime) => prevTotalPauseTime + 1);
-    }, 1000);
-  }
-  return () => clearInterval(interval);
-}, [isPaused]);
+  // Efecto para manejar el contador de pausa
+  useEffect(() => {
+    let interval;
+    if (isPaused) {
+      interval = setInterval(() => {
+        setTotalPauseTime((prevTotalPauseTime) => prevTotalPauseTime + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isPaused]);
 
   // Efecto para mostrar la alerta cuando el contador llegue a 60 segundos
   useEffect(() => {
@@ -101,33 +95,23 @@ useEffect(() => {
         const minutos = Math.floor(tiempo / 60); // Calcula los minutos transcurridos
         setMinutos(minutos);
         try {
-          const user = auth.currentUser;
-          if (user) {
-            const actividadData = {
-              actividad: actividad,
-              minutos: minutos,
-              marcaTiempo: now,
-              fecha: startTime.toLocaleDateString(),
-              horaInicio: startTime.toLocaleTimeString(),
-              horaFinal: now.toLocaleTimeString(),
-              interrupcion: totalPauseTime,
-              comentarios: comentarios,
-              completada: true,
-              unidades: 1,
-            };
-            await addDoc(
-              collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades'),
-              actividadData
-            ); // Agrega la actividad a Firestore
-            const actividadesQuery = query(
-              collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
-            );
-            const querySnapshot = await getDocs(actividadesQuery); // Obtiene las actividades actualizadas
-            const actividadesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            setActividades(actividadesData); // Actualiza el estado de actividades
-            setSelectedActivity(actividadData); // Establece la actividad seleccionada
-            setDetallesModalIsOpen(true); // Abre el modal de detalles
-          }
+          const actividadData = {
+            actividad: actividad,
+            minutos: minutos,
+            marcaTiempo: now,
+            fecha: startTime.toLocaleDateString(),
+            horaInicio: startTime.toLocaleTimeString(),
+            horaFinal: now.toLocaleTimeString(),
+            interrupcion: totalPauseTime,
+            comentarios: comentarios,
+            completada: true,
+            unidades: 1,
+          };
+          await addActividad(projectId, actividadData); // Agrega la actividad a Firestore
+          const actividadesData = await getActividades(projectId); // Obtiene las actividades actualizadas
+          setActividades(actividadesData); // Actualiza el estado de actividades
+          setSelectedActivity(actividadData); // Establece la actividad seleccionada
+          setDetallesModalIsOpen(true); // Abre el modal de detalles
         } catch (e) {
           console.error('Ha ocurrido un error al intentar agregar el documento: ', e); // Maneja errores
         }
@@ -147,19 +131,11 @@ useEffect(() => {
   const handleError = useCallback(
     async (formData) => {
       try {
-        const user = auth.currentUser;
-        if (user && projectId) {
-          const defectoData = {
-            ...formData,
-            tiempoCompostura: new Date().toISOString()
-          };
-          await addDoc(collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'defectos'), defectoData);
-          const defectosQuery = query(collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'defectos'));
-          const querySnapshot = await getDocs(defectosQuery);
-          const defectosData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          setDefectos(defectosData);
-          setSelectedDefecto(defectosData);
-        }
+        const defectoData = await addDefecto(projectId, formData);
+        const defectosData = await getDefectos(projectId);
+        setDefectos(defectosData);
+        setSelectedDefecto(defectoData);
+        console.log('Defecto guardado correctamente en Firestore:', defectoData); // Agrega este console.log para verificar si los datos se guardaron correctamente
       } catch (e) {
         console.error('Ha ocurrido un error al intentar agregar el documento: ', e);
       } finally {
@@ -204,33 +180,23 @@ const handleCloseAlerta = useCallback(() => {
       const minutos = Math.floor(tiempo / 60); // Calcula los minutos transcurridos
       setMinutos(minutos);
       try {
-        const user = auth.currentUser;
-        if (user) {
-          const actividadData = {
-            actividad: actividad,
-            minutos: minutos,
-            marcaTiempo: now,
-            fecha: startTime.toLocaleDateString(),
-            horaInicio: startTime.toLocaleTimeString(),
-            horaFinal: now.toLocaleTimeString(),
-            interrupcion: totalPauseTime,
-            comentarios: comentarios,
-            completada: true,
-            unidades: 1,
-          };
-          await addDoc(
-            collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades'),
-            actividadData
-          ); // Agrega la actividad a Firestore
-          const actividadesQuery = query(
-            collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
-          );
-          const querySnapshot = await getDocs(actividadesQuery); // Obtiene las actividades actualizadas
-          const actividadesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          setActividades(actividadesData); // Actualiza el estado de actividades
-          setSelectedActivity(actividadData); // Establece la actividad seleccionada
-          setDetallesModalIsOpen(true); // Abre el modal de detalles
-        }
+        const actividadData = {
+          actividad: actividad,
+          minutos: minutos,
+          marcaTiempo: now,
+          fecha: startTime.toLocaleDateString(),
+          horaInicio: startTime.toLocaleTimeString(),
+          horaFinal: now.toLocaleTimeString(),
+          interrupcion: totalPauseTime,
+          comentarios: comentarios,
+          completada: true,
+          unidades: 1,
+        };
+        await addActividad(projectId, actividadData); // Agrega la actividad a Firestore
+        const actividadesData = await getActividades(projectId); // Obtiene las actividades actualizadas
+        setActividades(actividadesData); // Actualiza el estado de actividades
+        setSelectedActivity(actividadData); // Establece la actividad seleccionada
+        setDetallesModalIsOpen(true); // Abre el modal de detalles
       } catch (e) {
         console.error('Ha ocurrido un error al intentar agregar el documento: ', e); // Maneja errores
       }
@@ -425,16 +391,9 @@ const handleCloseAlerta = useCallback(() => {
   const handleDelete = useCallback(
     async (id) => {
       try {
-        const user = auth.currentUser;
-        if (user) {
-          await deleteDoc(doc(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades', id)); // Elimina la actividad de Firestore
-          const actividadesQuery = query(
-            collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
-          );
-          const querySnapshot = await getDocs(actividadesQuery); // Obtiene las actividades actualizadas
-          const actividadesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          setActividades(actividadesData); // Actualiza el estado de actividades
-        }
+        await deleteActividad(projectId, id); // Elimina la actividad de Firestore
+        const actividadesData = await getActividades(projectId); // Obtiene las actividades actualizadas
+        setActividades(actividadesData); // Actualiza el estado de actividades
       } catch (e) {
         console.error('Ha ocurrido un error al intentar eliminar el documento: ', e); // Maneja errores
       }
@@ -475,58 +434,58 @@ const handleCloseAlerta = useCallback(() => {
   }
 
   return (
+    <>
     <div className='flex flex-col items-center'>
       <div className='w-full'>
         <NavBar /> 
       </div>
       <h1 className='font-bold text-2xl sm:text-4xl font-sans text-center my-6 sm:my-12'>Tiempo de la actividad</h1>
       {isRelojActivo && (
-<div className='flex flex-col items-center'>
-<video width={320} height={240} autoPlay muted loop className='rounded-lg'>
-        <source src="/samuLoader.mp4" type="video/mp4"/>
-      </video>
-        <p className='text-xl sm:text-2xl font-bold text-center'>Actividad: {actividad}</p>
-</div>
+        <div className='flex flex-col items-center'>
+          <video width={320} height={240} autoPlay muted loop className='rounded-lg'>
+            <source src="/samuLoader.mp4" type="video/mp4"/>
+          </video>
+          <p className='text-xl sm:text-2xl font-bold text-center'>Actividad: {actividad}</p>
+        </div>
       )}
-      <p className='text-2xl sm:text-4xl font-bold text-center'>{new Date(tiempo * 1000).toISOString().slice(11, 19)}</p>
+      <p className='text-xl sm:text-4xl font-bold text-center'>{new Date(tiempo * 1000).toISOString().slice(11, 19)}</p>
       <div className='flex flex-row gap-4 sm:gap-8'>
         {!isRelojActivo ? (
           <button
-            className='font-bold rounded bg-transparent w-32 sm:w-40 border-2 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-black hover:scale-125'
-            onClick={handleStart}
+          className='font-bold rounded bg-gradient-to-r from-blue-900 px-8 py-3  to-blue-950 sm:w-40 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-white hover:animate-pulse hover:scale-125 text-center'
+          onClick={handleStart}
           >
             Iniciar
           </button>
         ) : (
           <>
-          <div className='grid grid-cols-3 items-center gap-4 sm:gap-8'>
-            <button
-              className='font-bold rounded bg-transparent w-32 sm:w-40 border-2 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-black hover:scale-125'
-              onClick={handleStop}
-              >
-              Parar
-            </button>
-            <button
-              className='font-bold rounded bg-transparent w-32 sm:w-40 border-2 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-black hover:scale-125'
-              onClick={handlePauseResume}
-              >
-              {isPaused ? 'Reanudar' : 'Pausar'}
-            </button>
-            <button
-              className='font-bold rounded w-32 sm:w-40 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-red-800 bg-red-500 hover:text-black hover:scale-125'
-              onClick={() => setErrorModalIsOpen(true)}
-              >
-              ¡Error!
-            </button>
-
-              </div>
+            <div className='grid grid-cols-3 items-center gap-4 sm:gap-8'>
+              <button
+                className='font-bold rounded bg-transparent w-32 sm:w-40 border-2 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-black hover:scale-125'
+                onClick={handleStop}
+                >
+                Parar
+              </button>
+              <button
+                className='font-bold rounded bg-transparent w-32 sm:w-40 border-2 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-black hover:scale-125'
+                onClick={handlePauseResume}
+                >
+                {isPaused ? 'Reanudar' : 'Pausar'}
+              </button>
+              <button
+                className='font-bold rounded w-32 sm:w-40 px-4 py-2 my-4 sm:my-8 cursor-pointer hover:bg-red-800 bg-red-500 hover:text-black hover:scale-125'
+                onClick={() => setErrorModalIsOpen(true)}
+                >
+                ¡Error!
+              </button>
+            </div>
           </>
         )}
       </div>
       {isPaused && (
         <div className='items-center'>
-          <p className='text-2xl sm:text-xl text-green-700 font-bold text-center'>
-            Pausado {pauseTime ? new Date((totalPauseTime + (new Date() - pauseTime) / 1000) * 1000).toISOString().slice(11, 19) : '00:00:00'} segundos
+          <p className='text-xl sm:text-xl text-gray-300 font-bold text-center'>
+            Pausado {pauseTime ? new Date(totalPauseTime * 1000).toISOString().slice(11, 19) : '00:00:00'} segundos
           </p>
         </div>
       )}
@@ -540,7 +499,7 @@ const handleCloseAlerta = useCallback(() => {
                 <button
                   className='cursor-pointer hover:scale-110 mx-2 sm:mx-4'
                   onClick={() => handleDetalles(activity)}
-                >
+                  >
                   <svg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='#6EEB83'>
                     <path d='M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z' />
                   </svg>
@@ -548,7 +507,7 @@ const handleCloseAlerta = useCallback(() => {
                 <button
                   className='cursor-pointer hover:scale-110 mx-2 sm:mx-4'
                   onClick={() => handleDelete(activity.id)}
-                >
+                  >
                   <svg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='red'>
                     <path d='M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z' />
                   </svg>
@@ -579,36 +538,37 @@ const handleCloseAlerta = useCallback(() => {
         inputValue={inputValue}
         setInputValue={setInputValue}
         handleModalSubmit={handleModalSubmit}
-      />
+        />
       <FinalizarModal
         isOpen={finalizarModalIsOpen}
         onRequestClose={() => setFinalizarModalIsOpen(false)}
         actividad={actividad}
         minutos={minutos}
-      />
+        />
       <DetallesModal
         isOpen={detallesModalIsOpen}
         onRequestClose={() => setDetallesModalIsOpen(false)}
         actividad={selectedActivity}
-      />
+        />
       <ComentariosModal
         isOpen={comentariosModalIsOpen}
         onRequestClose={() => setComentariosModalIsOpen(false)}
         onSubmit={handleComentariosSubmit}
-      />
+        />
       <AlertaModal
         isOpen={alertaModalIsOpen}
         onRequestClose={handleCloseAlerta}
-      />
+        />
       <ErrorModal 
-      isOpen={errorModalIsOpen}
-      onRequestClose={() => setErrorModalIsOpen(false)}
-      onSubmit={handleError}
-      defecto={selectedDefecto}
-      selectedProject={{ id: projectId }}
-      />
+        isOpen={errorModalIsOpen}
+        onRequestClose={() => setErrorModalIsOpen(false)}
+        onSubmit={handleError}
+        defecto={selectedDefecto}
+        selectedProject={{ id: projectId }}
+        />
       <Footer />
     </div>
+    </>
   );
 };
 
