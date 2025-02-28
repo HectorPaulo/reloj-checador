@@ -10,13 +10,13 @@ const DetallesModal = ({ isOpen, onRequestClose, actividad }) => {
       onRequestClose={onRequestClose}
       contentLabel="Detalles de la Actividad"
       className="flex w-100 items-center justify-center"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      overlayClassName="fixed inset-0 backdrop-blur-md flex items-center justify-center"
     >
-      <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full">
+      <div className="border-2 p-6 rounded-4xl max-w-md w-full">
         {actividad ? (
           <>
             <h2 className="font-bold text-white text-3xl mb-4">Detalles de la Actividad</h2>
-            <table className="min-w-full bg-gray-700">
+            <table className="min-w-full">
               <thead>
                 <tr>
                   <th className="py-2 px-4 text-left text-white">Campo</th>

@@ -159,10 +159,11 @@ useEffect(() => {
           const defectosData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
           setDefectos(defectosData);
           setSelectedDefecto(defectosData);
-          setErrorModalIsOpen(true);
         }
       } catch (e) {
         console.error('Ha ocurrido un error al intentar agregar el documento: ', e);
+      } finally {
+        setErrorModalIsOpen(false); // Asegúrate de cerrar el modal aquí
       }
     },
     [projectId]
@@ -273,6 +274,16 @@ const handleCloseAlerta = useCallback(() => {
           ...doc.data(),
         }));
 
+        // Obtener todos los defectos del proyecto
+        const defectosQuery = query(
+          collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'defectos')
+        );
+        const defectosSnapshot = await getDocs(defectosQuery);
+        const defectosData = defectosSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
         // Crear un nuevo PDF
         const pdf = new jsPDF();
 
@@ -286,6 +297,7 @@ const handleCloseAlerta = useCallback(() => {
           ['Descripción', proyectoData.descripcion],
           ['Fecha de Creación', proyectoData.fechaCreacion],
           ['Total de Actividades', actividadesData.length],
+          ['Total de Defectos', defectosData.length],
         ];
 
         // Datos de las actividades en formato de tabla
@@ -301,11 +313,30 @@ const handleCloseAlerta = useCallback(() => {
           actividad.unidades,
         ]);
 
+        // Datos de los defectos en formato de tabla
+        const defectosTableData = defectosData.map((defecto) => [
+          defecto.fechaError,
+          defecto.tipoError,
+          defecto.encontrado,
+          defecto.removido,
+          defecto.arreglado ? 'Sí' : 'No',
+          defecto.descripcionError,
+          defecto.tiempoCompostura,
+        ]);
+
         // Crear la tabla de actividades
         pdf.autoTable({
           startY: 20,
           head: [['Actividad', 'Minutos', 'Fecha', 'Hora Inicio', 'Hora Final', 'Interrupción', 'Comentarios', 'Completada', 'Unidades']],
           body: actividadesTableData,
+          theme: 'grid',
+        });
+
+        // Crear la tabla de defectos
+        pdf.autoTable({
+          startY: pdf.autoTable.previous.finalY + 10,
+          head: [['Fecha Error', 'Tipo Error', 'Encontrado', 'Removido', 'Arreglado', 'Descripción', 'Tiempo Compostura']],
+          body: defectosTableData,
           theme: 'grid',
         });
 

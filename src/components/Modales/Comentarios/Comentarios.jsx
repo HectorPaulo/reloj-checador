@@ -27,13 +27,13 @@ const ComentariosModal = ({ isOpen, onRequestClose, onSubmit }) => {
       // Setting the content label for accessibility
       contentLabel="Comentarios de la Actividad"
       // Applying custom class names for styling the modal content
-      className="flex w-100 items-center justify-center"
+      className="flex items-center justify-center"
       // Applying custom class names for styling the modal overlay
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      overlayClassName="fixed inset-0 flex items-center backdrop-blur-lg justify-center"
     >
-      <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full">
+      <div className="bg-gradient-to-b from-green-500 via-green to-green-900 border-2 p-6 rounded-2xl  max-w-full">
         {/* Modal title */}
-        <h2 className="font-bold text-white text-3xl mb-4">Comentarios de la Actividad</h2>
+        <h2 className="font-bold text-white text-4xl mb-4">Comentarios</h2>
         {/* Textarea for user to input comments */}
         <textarea
           className="w-full p-3 mb-4 border border-gray-300 rounded-lg bg-white text-black"

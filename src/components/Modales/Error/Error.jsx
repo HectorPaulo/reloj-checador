@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import PropTypes from 'prop-types';
-import { addDoc, collection } from 'firebase/firestore';
-import { db, auth } from '/src/firebaseConfig';
 
 const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto, selectedProject }) => {
   const [formData, setFormData] = useState({
-    fechaError: '',
+    fechaError: new Date().toISOString().split('T')[0], // Fecha actual por defecto
     tipoError: '',
     encontrado: '',
     removido: '',
@@ -30,27 +28,9 @@ const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto, selectedProject
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-
-    try {
-      const user = auth.currentUser;
-      if (user && selectedProject) {
-        const docRef = await addDoc(collection(db, 'usuarios', user.uid, 'proyectos', selectedProject.id, 'defectos'), {
-          fechaError: formData.fechaError,
-          tipoError: formData.tipoError,
-          encontrado: formData.encontrado,
-          removido: formData.removido,
-          arreglado: formData.arreglado,
-          descripcionError: formData.descripcionError,
-          tiempoCompostura: new Date().toISOString()
-        });
-        console.log("Documento añadido con ID: ", docRef.id);
-      }
-    } catch (error) {
-      console.error("Error al añadir el documento: ", error);
-    }
-
-    onRequestClose();
+    console.log('Datos del formulario:', formData); // Agrega este console.log para verificar los datos del formulario
+    await onSubmit(formData); // Enviar los datos del formulario y esperar a que se complete
+    onRequestClose(); // Cerrar el modal después de enviar los datos
   };
 
   return (
@@ -61,7 +41,7 @@ const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto, selectedProject
       className="flex w-full items-center justify-center"
       overlayClassName="fixed inset-0 flex items-center justify-center backdrop-blur-md"
     >
-      <div className="bg-gradient-to-r from-gray-700 p-6 rounded-2xl max-w-md w-full">
+      <div className="bg-gradient-to-r from-gray-700 p-6 rounded-2xl max-w-md w-full md:max-w-lg lg:max-w-xl">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xl font-semibold text-white mb-2" htmlFor="fechaError">Fecha cuando se encontró el error</label>
@@ -127,7 +107,7 @@ ErrorModal.propTypes = {
   onRequestClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   defecto: PropTypes.object,
-  selectedProject: PropTypes.object.isRequired, // Añadir validación de PropTypes
+  selectedProject: PropTypes.object.isRequired,
 };
 
 export default ErrorModal;
