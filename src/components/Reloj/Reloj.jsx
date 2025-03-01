@@ -1,16 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import { Chart } from 'chart.js';
-import 'jspdf-autotable';
 import { useParams } from 'react-router-dom';
 import { addDefecto, getDefectos, addActividad, getActividades, deleteActividad } from '../../controllers/controller';
-import { db, auth } from '../../firebaseConfig';
-import { collection, addDoc, getDocs, query, doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { generarPDF } from '../../utils/GeneradorPdf';
 import AlertaModal from '../Modales/Alerta/Alerta';
-import { Bar } from 'react-chartjs-2';
-import 'chart.js/auto';
 import IniciarModal from '../Modales/Iniciar/Iniciar';
 import FinalizarModal from '../Modales/Finalizar/Finalizar';
 import DetallesModal from '../Modales/Detalles/DetallesModal';
@@ -19,6 +12,7 @@ import ErrorModal from '../Modales/Error/Error';
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import Loader from '../Loader/Loader';
+import { Bar } from 'react-chartjs-2';
 
 const Reloj = () => {
   const { projectId } = useParams();
@@ -127,6 +121,19 @@ const Reloj = () => {
     }
   }, [tiempo, alertaModalIsOpen, actividad, comentarios, projectId, startTime, totalPauseTime]);
 
+  // Efecto para cargar los defectos desde Firestore
+  useEffect(() => {
+    const fetchDefectos = async () => {
+      try {
+        const defectosData = await getDefectos(projectId);
+        setDefectos(defectosData);
+      } catch (error) {
+        console.error('Error al buscar los defectos: ', error);
+      }
+    };
+    fetchDefectos();
+  }, [projectId]);
+
   // Función para manejar la pausa o reanudación del reloj
   const handleError = useCallback(
     async (formData) => {
@@ -222,148 +229,7 @@ const handleCloseAlerta = useCallback(() => {
 
   // Función para generar el PDF del proyecto
   const handleDownload = useCallback(async () => {
-    try {
-      const user = auth.currentUser;
-      if (user) {
-        // Obtener los datos del proyecto desde Firestore
-        const proyectoRef = doc(db, 'usuarios', user.uid, 'proyectos', projectId);
-        const proyectoSnapshot = await getDoc(proyectoRef);
-        const proyectoData = proyectoSnapshot.data();
-
-        // Obtener todas las actividades del proyecto
-        const actividadesQuery = query(
-          collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'actividades')
-        );
-        const querySnapshot = await getDocs(actividadesQuery);
-        const actividadesData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Obtener todos los defectos del proyecto
-        const defectosQuery = query(
-          collection(db, 'usuarios', user.uid, 'proyectos', projectId, 'defectos')
-        );
-        const defectosSnapshot = await getDocs(defectosQuery);
-        const defectosData = defectosSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Crear un nuevo PDF
-        const pdf = new jsPDF();
-
-        // Título del PDF
-        pdf.setFontSize(18);
-        pdf.text(`Informe del Proyecto: ${proyectoData.nombre}`, 10, 10);
-
-        // Datos del proyecto en formato de tabla
-        const proyectoTableData = [
-          ['Nombre del Proyecto', proyectoData.nombre],
-          ['Descripción', proyectoData.descripcion],
-          ['Fecha de Creación', proyectoData.fechaCreacion],
-          ['Total de Actividades', actividadesData.length],
-          ['Total de Defectos', defectosData.length],
-        ];
-
-        // Datos de las actividades en formato de tabla
-        const actividadesTableData = actividadesData.map((actividad) => [
-          actividad.actividad,
-          actividad.minutos,
-          actividad.fecha,
-          actividad.horaInicio,
-          actividad.horaFinal,
-          actividad.interrupcion,
-          actividad.comentarios,
-          actividad.completada ? 'Sí' : 'No',
-          actividad.unidades,
-        ]);
-
-        // Datos de los defectos en formato de tabla
-        const defectosTableData = defectosData.map((defecto) => [
-          defecto.fechaError,
-          defecto.tipoError,
-          defecto.encontrado,
-          defecto.removido,
-          defecto.arreglado ? 'Sí' : 'No',
-          defecto.descripcionError,
-          defecto.tiempoCompostura,
-        ]);
-
-        // Crear la tabla de actividades
-        pdf.autoTable({
-          startY: 20,
-          head: [['Actividad', 'Minutos', 'Fecha', 'Hora Inicio', 'Hora Final', 'Interrupción', 'Comentarios', 'Completada', 'Unidades']],
-          body: actividadesTableData,
-          theme: 'grid',
-        });
-
-        // Crear la tabla de defectos
-        pdf.autoTable({
-          startY: pdf.autoTable.previous.finalY + 10,
-          head: [['Fecha Error', 'Tipo Error', 'Encontrado', 'Removido', 'Arreglado', 'Descripción', 'Tiempo Compostura']],
-          body: defectosTableData,
-          theme: 'grid',
-        });
-
-        // Crear un gráfico de barras con el tiempo total por actividad
-        const actividadesAgregadas = actividadesData.reduce((acc, curr) => {
-          const llave = curr.actividad;
-          if (!acc[llave]) {
-            acc[llave] = 0;
-          }
-          acc[llave] += curr.minutos;
-          return acc;
-        }, {});
-
-        const canvas = document.createElement('canvas');
-        canvas.width = 400;
-        canvas.height = 200;
-        document.body.appendChild(canvas);
-
-        const ctx = canvas.getContext('2d');
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: Object.keys(actividadesAgregadas),
-            datasets: [
-              {
-                label: 'Minutos por Actividad',
-                data: Object.values(actividadesAgregadas),
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-              },
-            ],
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
-          },
-        });
-
-        // Esperar a que la gráfica se renderice
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Capturar la gráfica como imagen
-        const chartImage = await html2canvas(canvas);
-        const chartImgData = chartImage.toDataURL('image/png');
-
-        // Agregar la gráfica al PDF
-        const imgWidth = 180;
-        const imgHeight = (chartImage.height * imgWidth) / chartImage.width;
-        pdf.addImage(chartImgData, 'PNG', 10, pdf.autoTable.previous.finalY + 10, imgWidth, imgHeight);
-
-        // Guardar el PDF
-        pdf.save(`informe_proyecto_${proyectoData.nombre}.pdf`);
-
-        // Limpiar el canvas temporal
-        document.body.removeChild(canvas);
-      }
-    } catch (error) {
-      console.error('Error al generar el PDF: ', error);
-    }
+    await generarPDF(projectId);
   }, [projectId]);
 
   // Función para manejar la pausa o reanudación del reloj
@@ -442,7 +308,7 @@ const handleCloseAlerta = useCallback(() => {
       <h1 className='font-bold text-2xl sm:text-4xl font-sans text-center my-6 sm:my-12'>Tiempo de la actividad</h1>
       {isRelojActivo && (
         <div className='flex flex-col items-center'>
-          <video width={320} height={240} autoPlay muted loop className='rounded-lg'>
+          <video width={320} height={240} autoPlay loop className='rounded-lg'>
             <source src="/samuLoader.mp4" type="video/mp4"/>
           </video>
           <p className='text-xl sm:text-2xl font-bold text-center'>Actividad: {actividad}</p>

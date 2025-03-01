@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import PropTypes from 'prop-types';
 
-const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto }) => {
+const ErrorModal = ({ isOpen, onRequestClose, onSubmit }) => {
   const defaultFormData = {
     fechaError: new Date().toISOString().split('T')[0], // Fecha actual por defecto
     tipoError: '',
@@ -77,6 +77,10 @@ const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto }) => {
               <option value="postMortem">Post mortem</option>
             </select>
           </div>
+          <div className="flex items-center">
+            <label className="text-white font-semibold text-lg" htmlFor="arreglado">Defecto arreglado</label>
+            <input className="mx-4" type="checkbox" name="arreglado" id="arreglado" checked={formData.arreglado} onChange={handleChange} />
+          {formData.arreglado && (
           <div>
             <label className="block text-xl font-semibold text-white mb-2" htmlFor="removido">Removido</label>
             <select className="rounded-xl border-2 text-lg font-semibold p-4 w-full" name="removido" id="removido" value={formData.removido} onChange={handleChange}>
@@ -89,14 +93,13 @@ const ErrorModal = ({ isOpen, onRequestClose, onSubmit, defecto }) => {
               <option value="postMortem">Post mortem</option>
             </select>
           </div>
-          <div className="flex items-center">
-            <input className="mx-4" type="checkbox" name="arreglado" id="arreglado" checked={formData.arreglado} onChange={handleChange} />
-            <label className="text-white font-semibold text-lg" htmlFor="arreglado">Defecto arreglado</label>
+            
+          )}
           </div>
-          <div>
-            <label className="block text-xl font-semibold text-white mb-2" htmlFor="descripcionError">Comentarios</label>
-            <textarea placeholder='' className="rounded-xl border-2 p-4 w-full" name="descripcionError" id="descripcionError" cols="30" rows="4" value={formData.descripcionError} onChange={handleChange}></textarea>
-          </div>
+            <div>
+              <label className="block text-xl font-semibold text-white mb-2" htmlFor="descripcionError">Comentarios</label>
+              <textarea placeholder='' className="rounded-xl border-2 p-4 w-full" name="descripcionError" id="descripcionError" cols="30" rows="4" value={formData.descripcionError} onChange={handleChange}></textarea>
+            </div>
           <div className='flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4'>
             <button onClick={onRequestClose} type="button" className="bg-gradient-to-l from-red-500 via-red-700 to-red-900 font-semibold text-lg text-white px-8 py-4 rounded-xl cursor-pointer hover:scale-110 w-full">Cerrar</button>
             <button type="submit" className="bg-gradient-to-r from-blue-500 via-blue-700 to-blue-900 font-semibold text-lg text-white px-8 py-4 rounded-xl cursor-pointer hover:scale-110 w-full">Aceptar</button>
