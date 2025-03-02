@@ -81,36 +81,36 @@ const Login = ({ onLogin }) => { // Define el componente Login que recibe la fun
 
   return ( // Retorna el JSX del componente
     <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-0" onClick={handleCloseWarning}>
-      <h1 className="text-4xl mb-10 lg:text-5xl text-center font-bold ">{isRegister ? 'Registro' : 'Inicio de sesión'}</h1>
-      <form onSubmit={handleSubmit} className="bg-transparent p-6 rounded-xl border w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+      <h1 className="text-4xl my-10 lg:text-5xl text-center font-bold ">{isRegister ? 'Registro' : 'Inicio de sesión'}</h1>
+      <form onSubmit={handleSubmit} className="p-6 rounded w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className={isRegister ? 'mb-4' : 'mb-8 mt-4'}>
-          <label className="block text-white font-semibold mb-2">Correo Electrónico</label>
+          <label className="block text-white font-semibold my-4 text-xl">Correo Electrónico</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-3 border-2 text-xl font-semibold border-blue-300 rounded my-1"
             required
           />
         </div>
         <div className={isRegister ? 'mb-4' : 'mb-8'}>
-          <label className="block text-white font-semibold mb-2">Contraseña</label>
+          <label className="block text-white font-semibold my-4 text-xl">Contraseña</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-3 border-2 text-xl font-semibold border-blue-300 rounded my-1"
             required
           />
         </div>
         {isRegister && (
           <div className="mb-4">
-            <label className="block text-white font-semibold mb-2">Confirmar contraseña</label>
+            <label className="block text-white font-semibold my-4 text-xl">Confirmar contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mb-4 mt-1"
+              className="w-full p-3 border-2 text-xl font-semibold border-blue-300 rounded my-1"
               required
             />
           </div>
@@ -119,19 +119,19 @@ const Login = ({ onLogin }) => { // Define el componente Login que recibe la fun
         {success && <AlertaExito mensaje={success} onClose={handleCloseSuccess} />}
         {warning && <AlertaAdvertencia mensaje={warning} onClose={handleCloseWarning} />}
         <div className="flex justify-center">
-          <button type="submit" className="w-full bg-transparent border text-white p-2 rounded cursor-pointer hover:bg-amber-50 hover:text-black">
+          <button type="submit" className="w-full bg-gradient-to-r from-blue-300 to-blue-500 rounded-lg py-2 font-semibold text-xl text-gray-800 my-6 cursor-pointer hover:scale-110 hover:animate-pulse hover:bg-gradient-to-r hover:from-green-500 hover:to-green-700 hover:text-white">
             {isRegister ? 'Registrarse' : 'Entrar'}
           </button>
         </div>
         <div className="flex justify-center mt-4">
-          <button type="button" onClick={handleGoogleSignIn} className="w-full bg-transparent border text-white p-2 rounded cursor-pointer hover:bg-amber-50 hover:text-black">
+          <button type="button" onClick={handleGoogleSignIn} className="p-4 bg-gradient-to-r from-blue-500 to-blue-700  rounded-full cursor-pointer hover:bg-gradient-to-r hover:from-green-500 hover:to-green-700 hover:scale-110 hover:animate-pulse my-2">
             <GoogleIcon />
           </button>
         </div>
-        <p className="mt-4 text-center">
+        <p className="my-6 text-center font-semibold text-white text-lg">
           {isRegister ? '¿Ya tienes una cuenta?' : "¿No tienes cuenta aún?"}{' '}
           <span
-            className="text-blue-500 cursor-pointer"
+            className="text-sky-500 cursor-pointer"
             onClick={() => setIsRegister(!isRegister)}
           >
             {isRegister ? 'Inicia sesión' : 'Regístrate'}

@@ -9,11 +9,12 @@ import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import ConfirmarBorrar from '../Modales/Borrar/BorrarModal';
 import DetallesProyectoModal from '../Modales/DetallesProyecto/DetallesProyecto';
+import Loader from '../Loader/Loader';
 
 const Proyectos = ({ onSelectProject }) => {
   const [inputValue, setInputValue] = useState('');
   const [proyectos, setProyectos] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Cambiar el estado inicial a true
   const [borrarId, setBorrarId] = useState(null);
   const [borrarModalIsOpen, setBorrarModalIsOpen] = useState(false);
   const [detallesProyectoModalIsOpen, setDetallesProyectoModalIsOpen] = useState(false);
@@ -31,6 +32,8 @@ const Proyectos = ({ onSelectProject }) => {
         }
       } catch (error) {
         console.error('Error al buscar los proyectos: ', error);
+      } finally {
+        setIsLoading(false); // Cambiar el estado a false después de obtener los datos
       }
     };
     fetchProyectos();
@@ -98,6 +101,10 @@ const Proyectos = ({ onSelectProject }) => {
   const handleDownload = useCallback(async (projectId) => {
     await generarPDF(projectId);
   }, []);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div className='flex flex-col min-h-screen'>

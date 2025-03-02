@@ -1,17 +1,27 @@
-/* eslint-disable no-unused-vars */ // Disable ESLint rule for unused variables
-import React from 'react'; // Import React library
-import './Loader.css'; // Import CSS file for styling
+/* eslint-disable no-unused-vars */ 
+import React from 'react';
+import './Loader.css'; 
 
-const Loader = () => { // Define Loader functional component
+const Loader = () => { 
   return (
-    <div className='loader-container'> {/* Container for the loader */}
-      <div className="loader"> {/* Loader element */}
-        <span></span> {/* Individual loader element */}
-        <span></span> {/* Individual loader element */}
-        <span></span> {/* Individual loader element */}
+    <div className='flex items-center justify-center h-screen'>
+      <div className="pl">
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__dot"></div>
+        <div className="pl__text">Cargando...</div>
       </div>
     </div>
   );
 };
 
-export default Loader; // Export Loader component as default
+export default Loader; 
