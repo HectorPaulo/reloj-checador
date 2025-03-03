@@ -26,9 +26,11 @@ const NavBar = () => {
     };
 
     return (
-        <nav className='bg-transparent p-6'> {/* Contenedor del navbar con estilos */}
-                <div className="font-bold  text-xl smky-btn3 relative hover:text-[#778464] py-2 px-6 after:absolute after:h-1 after:hover:h-[200%] transition-all duration-500 hover:transition-all hover:duration-500 after:transition-all after:duration-500 after:hover:transition-all after:hover:duration-500 overflow-hidden z-20 after:z-[-20] after:bg-[#abd373] after:rounded-t-full after:w-full after:bottom-0 w-120 cursor-none text-center after:left-0 text-white"> {/* Contenedor para mostrar la fecha y hora */}
-                    Hoy es {dateTime.toLocaleDateString()} a las {dateTime.toLocaleTimeString()} {/* Muestra la fecha y hora actual */}
+        <nav className='bg-transparent p-6'>
+            <div>
+                        <div className="hidden md:block font-bold text-xl smky-btn3 relative hover:text-[#778464] py-2 px-6 after:absolute after:h-1 after:hover:h-[200%] transition-all duration-500 hover:transition-all hover:duration-500 after:transition-all after:duration-500 after:hover:transition-all after:hover:duration-500 overflow-hidden z-20 after:z-[-20] after:bg-[#abd373] after:rounded-t-full after:w-full after:bottom-0 w-120 cursor-none text-center after:left-0 text-white"> {/* Contenedor para mostrar la fecha y hora */}
+                            Hoy es {dateTime.toLocaleDateString()} a las {dateTime.toLocaleTimeString()} {/* Muestra la fecha y hora actual */}
+                        </div>
                 </div>
             <div className='flex justify-between items-center'> {/* Contenedor flex para alinear elementos */}
                 <div className='md:hidden'> {/* Botón para abrir/cerrar el menú en dispositivos móviles */}
