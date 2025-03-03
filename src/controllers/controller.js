@@ -1,5 +1,5 @@
 import { db, auth } from '../firebaseConfig';
-import { collection, addDoc, getDocs, query, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, doc, deleteDoc, getDoc } from 'firebase/firestore';
 
 // Función para agregar un defecto
 export const addDefecto = async (id, formData) => {
@@ -94,3 +94,19 @@ export const deleteProyecto = async (id) => {
     throw e;
   }
 }
+
+// Función para obtener un proyecto por ID
+export const getProjectById = async (projectId) => {
+  try {
+    const projectDoc = doc(db, 'usuarios', auth.currentUser.uid, 'proyectos', projectId);
+    const projectSnapshot = await getDoc(projectDoc);
+    if (projectSnapshot.exists()) {
+      return projectSnapshot.data();
+    } else {
+      throw new Error('No se encontró el proyecto');
+    }
+  } catch (error) {
+    console.error('Error al obtener el proyecto: ', error);
+    throw error;
+  }
+};

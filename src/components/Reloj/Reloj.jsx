@@ -12,6 +12,7 @@ import ErrorModal from '../Modales/Error/Error';
 import NavBar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 import GraficaActividades from '../GraficaActividades/GraficaActividades';
+import { agruparActividades } from '../../utils/agrupadorActividades';
 
 const Reloj = () => {
   const { projectId } = useParams();
@@ -55,7 +56,8 @@ const Reloj = () => {
     const fetchActividades = async () => {
       try {
         const actividadesData = await getActividades(projectId);
-        setActividades(actividadesData);
+        const actividadesAgrupadas = agruparActividades(actividadesData);
+        setActividades(actividadesAgrupadas);
       } catch (error) {
         console.error('Error al buscar las actividades: ', error);
       } finally {
@@ -283,7 +285,7 @@ const Reloj = () => {
           {!isRelojActivo ? (
             <div className='flex justify-center items-center w-full'>
               <button
-                className='font-bold rounded bg-gradient-to-r from-blue-900 px-8 py-3 to-blue-950 sm:w-40 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-white hover:animate-pulse hover:scale-125 text-center'
+                className='font-bold text-xl rounded-xl bg-gradient-to-r from-gray-900 px-8 py-3 to-blue-950 sm:w-40 sm:my-8 cursor-pointer hover:bg-amber-50 hover:text-white hover:animate-pulse hover:scale-125 text-center'
                 onClick={handleStart}
               >
                 Iniciar
@@ -324,8 +326,8 @@ const Reloj = () => {
         <div className='w-full mt-4 sm:mt-8'>
           <h2 className='text-center text-xl sm:text-2xl font-bold'>Lista de Actividades</h2>
           <ul className='w-full max-w-2xl mx-auto'>
-            {actividades.map((activity) => (
-              <li key={activity.id} className='flex justify-between items-center p-2 border-b'>
+            {actividades.map((activity, index) => (
+              <li key={activity.id || index} className='flex justify-between items-center p-2 border-b'>
                 <span>{activity.actividad}</span>
                 <div>
                   <button

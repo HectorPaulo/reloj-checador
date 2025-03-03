@@ -30,7 +30,7 @@ const DetallesProyectoModal = ({ isOpen, onRequestClose, projectId }) => {
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       className='flex items-center justify-center p-4 sm:p-8'
-      overlayClassName='fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center'
+      overlayClassName='fixed inset-0 flex items-center justify-center backdrop-blur-lg'
       contentLabel='Detalles del Proyecto'
     >
       <div className='w-full max-w-full bg-gradient-to-l from-gray-900 to-gray-700 p-6 rounded-lg shadow-lg'>
@@ -79,10 +79,10 @@ const DetallesProyectoModal = ({ isOpen, onRequestClose, projectId }) => {
         </div>
         <div className='flex justify-center'>
           <button
-            className='mt-4 rounded border bg-transparent cursor-pointer font-semibold text-gray-800 hover:scale-110 hover:text-white hover:bg-gray-800 px-4 py-2'
+            className='rounded-xl bg-gradient-to-r from-blue-800 to-blue-950 text-xl font-semibold text-white w-1/2 px-4 py-4 my-4 cursor-pointer hover:scale-110 hover:animate-pulse hover:bg-gradient-to-r hover:from-green-500 hover:to-green-900 hover:via-green-700'
             onClick={onRequestClose}
           >
-            Aceptar
+            Cerrar
           </button>
         </div>
       </div>

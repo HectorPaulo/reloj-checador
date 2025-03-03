@@ -39,6 +39,7 @@ const Proyectos = ({ onSelectProject }) => {
     fetchProyectos();
   }, []);
 
+  
   const handleAddProject = useCallback(async () => {
     try {
       const user = auth.currentUser;
@@ -84,6 +85,7 @@ const Proyectos = ({ onSelectProject }) => {
     }
   }, [inputValue, onSelectProject]);
 
+  // Abrir modal para confirmar si el usuario desea eliminar el proyecto
   const handleDeleteProject = useCallback(async (id) => {
     try {
       setBorrarId(id);
@@ -93,11 +95,13 @@ const Proyectos = ({ onSelectProject }) => {
     }
   }, []);
 
+  // Abrir modal con la información de los defectos del proyecto
   const handleDetallesProyecto = useCallback((projectId) => {
     setSelectedProjectId(projectId);
     setDetallesProyectoModalIsOpen(true);
   }, []);
 
+  // -----> Generar el pdf
   const handleDownload = useCallback(async (projectId) => {
     await generarPDF(projectId);
   }, []);

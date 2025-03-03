@@ -66,7 +66,7 @@ const IniciarModal = ({ isOpen, onRequestClose, inputValue, setInputValue, handl
         <option value="Pruebas">Pruebas</option>
         <option value="Lanzamiento">Lanzamiento</option>
         <option value="Revision">Revisión</option>
-        <option value="RevisionCodigo">Revisión del código</option>
+        <option value="Revisión del Código">Revisión del código</option>
         <option value="Diagramar">Diagramar</option>
         <option value="Reunion">Reunión</option>
       </select>
